@@ -1,23 +1,26 @@
 class Player {
+  #id;
+  #socket;
+
   constructor(socket) {
-    this._id = socket.id;
-    this._socket = socket;
+    this.#id = socket.id;
+    this.#socket = socket;
   }
 
   get id() {
-    return this._id;
+    return this.#id;
   }
 
   get socket() {
-    return this._socket;
+    return this.#socket;
   }
 
   set id(id) {
-    this._id = id;
+    this.#id = id;
   }
 
   set socket(socket) {
-    this._socket = socket;
+    this.#socket = socket;
   }
 }
 

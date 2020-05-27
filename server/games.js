@@ -1,8 +1,10 @@
 const Game = require('./game.js');
 
 class Games {
+  #games
+
   constructor() {
-    this._games = [];
+    this.#games = [];
   }
 
   addGame(game) {
@@ -24,7 +26,7 @@ class Games {
   }
 
   get games() {
-    return this._games;
+    return this.#games;
   }
 
   getGame(id) {
@@ -38,7 +40,7 @@ class Games {
   }
 
   set games(games) {
-    this._games = games;
+    this.#games = games;
   }
 }
 

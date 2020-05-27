@@ -1,8 +1,12 @@
 class Game {
+  #id;
+  #players;
+  #status;
+
   constructor(id) {
-    this._id = id;
-    this._players = [];
-    this._status = 'Staged'
+    this.#id = id;
+    this.#players = [];
+    this.#status = 'Staged'
   }
 
   addPlayer(player) {
@@ -17,15 +21,15 @@ class Game {
   }
 
   get id() {
-    return this._id;
+    return this.#id;
   }
 
   get players() {
-    return this._players;
+    return this.#players;
   }
 
   get status() {
-    return this._status;
+    return this.#status;
   }
 
   getNumberOfPlayers() {
@@ -43,11 +47,11 @@ class Game {
   }
 
   set players(players) {
-    this._players = players;
+    this.#players = players;
   }
 
   set status(status) {
-    this._status = status;
+    this.#status = status;
   }
 
   updateStatus() {
