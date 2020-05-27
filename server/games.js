@@ -18,6 +18,11 @@ class Games {
     return game;
   }
 
+  doesGameExist(id) {
+    console.log("Finding game", id);
+    return this.games.includes(game => game.id === id);
+  }
+
   get games() {
     return this._games;
   }
@@ -27,9 +32,13 @@ class Games {
     return this.games.find(game => game.id === id)
   }
 
-  doesGameExist(id) {
-    console.log("Finding game", id);
-    return this.games.includes(game => game.id === id);
+  removeGame(id) {
+    console.log("Removing game", id);
+    this.games = this.games.filter(game => game.id !== id);
+  }
+
+  set games(games) {
+    this._games = games;
   }
 }
 
