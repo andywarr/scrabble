@@ -36,7 +36,8 @@ io.on('connection', (socket) => {
     game.addPlayer(player);
 
     if (game.getNumberOfPlayers() >= 2) {
-      game.updateStatus('Ready');
+      game.status = 'Ready';
+      game.updateStatus();
     }
   });
 });

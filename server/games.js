@@ -7,7 +7,7 @@ class Games {
 
   addGame(game) {
     console.log("Adding game", game.id);
-    this._games.push(game);
+    this.games.push(game);
   }
 
   createGame(id) {
@@ -18,14 +18,18 @@ class Games {
     return game;
   }
 
+  get games() {
+    return this._games;
+  }
+
   getGame(id) {
     console.log("Getting game", id);
-    return this._games.find(game => game.id === id)
+    return this.games.find(game => game.id === id)
   }
 
   doesGameExist(id) {
     console.log("Finding game", id);
-    return this._games.includes(game => game.id === id);
+    return this.games.includes(game => game.id === id);
   }
 }
 

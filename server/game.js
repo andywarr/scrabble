@@ -7,38 +7,43 @@ class Game {
 
   addPlayer(player) {
     if (!this.doesPlayerExist(player.id)) {
-      this._players.push(player);
+      this.players.push(player);
     }
   }
 
   doesPlayerExist(id) {
     console.log("Finding player", id);
-    return this._players.includes(player => player.id === id);
+    return this.players.includes(player => player.id === id);
   }
 
   get id() {
     return this._id;
   }
 
+  get players() {
+    return this._players;
+  }
+
+  get status() {
+    return this._status;
+  }
+
   getNumberOfPlayers() {
-    return this._players.length;
+    return this.players.length;
   }
 
   getPlayer(id) {
     console.log("Getting player", id);
-    return this._players.find(player => player.id === id);
+    return this.players.find(player => player.id === id);
   }
 
-  sendAllPlayersMessage(name, data) {
-    console.log("Send all players a message", name, data);
-    this._players.forEach(player => player.socket.emit(name, data));
-  }
-
-  updateStatus(status) {
-    console.log("Update status", status);
+  set status(status) {
     this._status = status;
+  }
 
-    this.sendAllPlayersMessage('status', { status: status });
+  updateStatus() {
+    console.log("Updating status", this.status);
+    this.players.forEach(player => player.socket.emit('status', { status: this.status }));
   }
 }
 
