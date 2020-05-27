@@ -5,6 +5,38 @@
     <title>Scrabble</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <style>
+    #copy-game-link {
+      background: transparent;
+      border: none;
+      color: white;
+      outline: none;
+    }
+
+    #copy-game-link:active {
+      background: #555;
+    }
+
+    #game-link {
+      background: transparent;
+      border: none;
+      box-sizing: border-box;
+      color: white;
+      display: block;
+      flex-grow:2;
+      font-size: 18px;
+      margin: 2px;
+      outline: none;
+      padding: 5px;
+      width: 100%;
+    }
+
+    #game-link-container {
+      border: 2px solid #FFF;
+      border-radius: 2px;
+      display:flex;
+      flex-direction:row;
+    }
+
     html {
       background-color: #fefefe;
       font-family: 'Roboto', sans-serif;
@@ -53,8 +85,12 @@
 
     <div class="modal" id="modal">
       <div class="modal-container">
-        <h1>Modal Example</h1>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Repudiandae expedita corrupti laudantium aperiam, doloremque explicabo ipsum earum dicta saepe delectus totam vitae ipsam doloribus et obcaecati facilis eius assumenda, cumque.</p>
+        <h1>Share</h1>
+        <p>Send the link below with up to three friend. You will be able to play the game once others join.</p>
+        <form id="game-link-container">
+          <input id="game-link" type="text" value="Loading..." readonly>
+          <input id="copy-game-link" value="Copy" type="button" onclick="copy()">
+        </form>
       </div>
     </div>
     <div class="modal-overlay" id="modal-overlay"></div>
@@ -63,9 +99,26 @@
     <script type="text/javascript">
       var socket = io();
 
+      var copy = function() {
+        var copyText = document.querySelector("#game-link");
+        copyText.select();
+        document.execCommand("copy");
+
+        document.querySelector("#copy-game-link").value = "Copied";
+        setTimeout(function(){
+          document.querySelector("#copy-game-link").value = "Copy";
+        }, 3000);
+      }
+
+      var updateLink = function() {
+        document.getElementById("game-link").value = window.location.href;
+      }
+
       socket.on('connect', () => {
         var gameId = getGameId();
         var playerId = getPlayerId(socket);
+
+        updateLink();
 
         socket.emit('game', { gameId: gameId });
       });
