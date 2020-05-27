@@ -20,30 +20,12 @@ class Games {
 
   getGame(id) {
     console.log("Getting game", id);
-    var game = null;
-
-    for (var i = 0, len = this._games.length; i < len; i++) {
-      if (this._games[i].id === id) {
-        game = this._games[i];
-        break;
-      }
-    }
-
-    return game;
+    return this._games.find(game => game.id === id)
   }
 
   doesGameExist(id) {
     console.log("Finding game", id);
-    var doesPlayerExist = false;
-
-    for (var i = 0, len = this._games.length; i < len; i++) {
-      if (this.games[i].id === id) {
-        doesPlayerExist =  true;
-        break;
-      }
-    }
-
-    return doesPlayerExist;
+    return this._games.includes(game => game.id === id);
   }
 }
 

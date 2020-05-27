@@ -13,16 +13,7 @@ class Game {
 
   doesPlayerExist(id) {
     console.log("Finding player", id);
-    var doesPlayerExist = false;
-
-    for (var i = 0, len = this._players.length; i < len; i++) {
-      if (this._players[i].id === id) {
-        doesPlayerExist =  true;
-        break;
-      }
-    }
-
-    return doesPlayerExist;
+    return this._players.includes(player => player.id === id);
   }
 
   get id() {
@@ -35,25 +26,12 @@ class Game {
 
   getPlayer(id) {
     console.log("Getting player", id);
-    var player = null;
-
-    for (var i = 0, len = this._players.length; i < len; i++) {
-      if (this._players[i].id === id) {
-        player = this._players[i];
-        break;
-      }
-    }
-
-    return player;
+    return this._players.find(player => player.id === id);
   }
 
   sendAllPlayersMessage(name, data) {
     console.log("Send all players a message", name, data);
-
-    for (var i = 0, len = this._players.length; i < len; i++) {
-      this._players[i].socket.emit(name, data);
-    }
-
+    this._players.forEach(player => player.socket.emit(name, data));
   }
 
   updateStatus(status) {
