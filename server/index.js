@@ -1,4 +1,5 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var path = require('path');
@@ -7,6 +8,8 @@ const Games = require('./games.js');
 const Player = require('./player.js');
 
 var games = new Games();
+
+app.use('/static', express.static('public'));
 
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname + '/../client/index.html'));

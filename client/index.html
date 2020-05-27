@@ -2,10 +2,30 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Scrabble</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+    html {
+      background-color: #fefefe;
+      background: url(static/images/background.png) no-repeat top left fixed;
+      background-size: contain;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    #container {
+      margin-left: 10%;
+      margin-right: 16px;
+      margin-top: 32%;
+    }
+    </style>
   </head>
   <body>
-    <button id="play" type="button" name="button">Play</button>
+    <div id="container">
+      <h1>A multiplayer online game</h1>
+      <p>Create. Share. Play.</p>
+      <button id="play" type="button" name="button">Play</button>
+    </div>
   </body>
   <script>
     var ID = function () {
