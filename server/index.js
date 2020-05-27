@@ -33,11 +33,16 @@ io.on('connection', (socket) => {
       game = games.createGame(gameId);
     }
 
-    game.addPlayer(player);
+    if (game.getNumberOfPlayers() < 4) {
+        game.addPlayer(player);
 
-    if (game.getNumberOfPlayers() >= 2) {
-      game.status = 'Ready';
-      game.updateStatus();
+        if (game.getNumberOfPlayers() >= 2) {
+          game.status = 'Ready';
+          game.updateStatus();
+        }
+    } else {
+      // Maximum number of players
+      player.socket.emit('issue', { msg: "full" });
     }
   });
 

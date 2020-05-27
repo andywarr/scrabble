@@ -21,6 +21,10 @@
         console.log(data);
       });
 
+      socket.on('issue', (data) => {
+        console.log(data);
+      });
+
       var getGameId = function() {
         return window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
       }
