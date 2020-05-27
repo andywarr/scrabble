@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Scrabble</title>
+  </head>
+  <body>
+
+    <script src="/socket.io/socket.io.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      var socket = io();
+
+      socket.on('connect', () => {
+        var gameId = getGameId();
+        var playerId = getPlayerId(socket);
+
+        socket.emit('game', { gameId: gameId });
+      });
+
+      socket.on('status', (data) => {
+        console.log(data);
+      });
+
+      var getGameId = function() {
+        return window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
+      }
+
+      var getPlayerId = function(socket) {
+        return socket.id;
+      }
+    </script>
+  </body>
+</html>

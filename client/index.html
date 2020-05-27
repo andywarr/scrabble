@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Scrabble</title>
+  </head>
+  <body>
+    <button id="play" type="button" name="button">Play</button>
+  </body>
+  <script>
+    var ID = function () {
+      return Math.random().toString(36).substr(2, 9);
+    };
+
+    document.getElementById("play").addEventListener("click", function(){
+      window.location.href = './play/' + ID();
+    });
+  </script>
+</html>
