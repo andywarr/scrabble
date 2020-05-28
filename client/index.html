@@ -6,26 +6,59 @@
     <title>Scrabble</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <style>
-    html {
-      background-color: #fefefe;
-      background: url(static/images/background.png) no-repeat top left fixed;
-      background-size: contain;
-      font-family: 'Roboto', sans-serif;
+    body {
+      background-color: #333;
+      height: inherit;
+      margin: 0;
+      width: inherit;
     }
 
-    #container {
-      margin-left: 10%;
-      margin-right: 16px;
-      margin-top: 32%;
+    .container {
+      display: flex;
+      flex-flow: row wrap;
+      height: inherit;
+      justify-content: center;
+      min-width: 900px;
+      width: 100%;
+    }
+
+    .container > * {
+      flex: 1;
+      max-width: 900px;
+    }
+
+    #hero {
+      background: url(static/images/background.png) no-repeat top;
+      background-size: 100%;
+      height: 500px;
+    }
+
+    html {
+      color: #fff;
+      font-family: 'Roboto', sans-serif;
+      height: 100%;
+      width: 100%;
+    }
+
+    #main {
+      width: inherit;
     }
     </style>
   </head>
   <body>
-    <div id="container">
-      <h1>A multiplayer online game</h1>
-      <p>Create. Share. Play.</p>
-      <button id="play" type="button" name="button">Play</button>
+  
+    <div class="container">
+      <div id=main>
+        <div id="hero">
+        </div>
+        <div>
+           <h1>A multiplayer online game</h1>
+           <p>Create. Share. Play.</p>
+           <button id="play" type="button" name="button">Play</button>
+         </div>
+      </div>
     </div>
+
   </body>
   <script>
     var ID = function () {

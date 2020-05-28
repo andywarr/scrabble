@@ -41,8 +41,9 @@ io.on('connection', (socket) => {
 
         if (game.getNumberOfPlayers() >= 2) {
           game.status = 'Ready';
-          game.updateStatus();
         }
+
+        game.updateStatus();
     } else {
       // Maximum number of players
       player.socket.emit('issue', { msg: "full" });
