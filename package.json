@@ -2,8 +2,21 @@
   "name": "scrabble",
   "version": "0.0.1",
   "description": "A better scrabble app",
+  "private": true,
+  "keywords": [
+    "Scrabble"
+  ],
+  "author": "Andrew Warr",
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack-dev-server --watch",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --watch"
+  },
   "dependencies": {
     "express": "^4.17.1",
     "socket.io": "^2.3.0"
-  }
+  },
+  "devDependencies": {}
 }
