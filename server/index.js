@@ -9,7 +9,7 @@ const Player = require('./player.js');
 
 var games = new Games();
 
-app.use('/static', express.static('public'));
+app.use('/static', express.static('./client/public'));
 
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname + '/../client/index.html'));
