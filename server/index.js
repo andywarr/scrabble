@@ -9,15 +9,15 @@ const Player = require('./player.js');
 
 var games = new Games();
 
-app.use('/static', express.static('./client/public'));
+app.use('/static', express.static('./client/dist'));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname + '/../client/index.html'));
+  res.sendFile(path.resolve(__dirname + '/../client/dist/index.html'));
 });
 
 app.get('/play/:gameId', (req, res) => {
   var gameId = req.params.gameId;
-  res.sendFile(path.resolve(__dirname + '/../client/game.html'));
+  res.sendFile(path.resolve(__dirname + '/../client/dist/game.html'));
 });
 
 // Event executed when a player first opens a game

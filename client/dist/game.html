@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Scrabble</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  </head>
+  <body>
+
+    <div class="container">
+      <div id=main>
+        <div id="root"></div>
+      </div>
+    </div>
+
+    <div class="modal-overlay closed" id="modal-overlay"></div>
+
+    <div class="modal closed" id="share-modal">
+      <div class="modal-container">
+        <h1>Share</h1>
+        <p>Send the link below with up to three friend. You will be able to play the game once others join.</p>
+        <form id="game-link-container">
+          <input id="game-link" type="text" value="Loading..." readonly>
+          <input id="copy-game-link" value="Copy" type="button" onclick="copy()">
+        </form>
+      </div>
+    </div>
+
+  <script src="/static/js/game.js"></script></body>
+</html>

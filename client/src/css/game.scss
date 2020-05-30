@@ -1,0 +1,74 @@
+#copy-game-link {
+  background: transparent;
+  border: none;
+  color: white;
+  outline: none;
+}
+
+#copy-game-link:active {
+  background: #555;
+}
+
+#game-link {
+  background: transparent;
+  border: none;
+  box-sizing: border-box;
+  color: white;
+  display: block;
+  flex-grow:2;
+  font-size: 18px;
+  margin: 2px;
+  outline: none;
+  padding: 5px;
+  width: 100%;
+}
+
+#game-link-container {
+  border: 2px solid #FFF;
+  border-radius: 2px;
+  display:flex;
+  flex-direction:row;
+}
+
+html {
+  background-color: #fefefe;
+  font-family: 'Roboto', sans-serif;
+}
+
+.modal {
+  background: #333;
+  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.8);
+  color: #FFF;
+  display: block;
+  height: 400px;
+  left: 50%;
+  max-height: 100%;
+  max-width: 100%;
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  z-index: 1010;
+}
+
+.closed {
+  display: none;
+}
+
+.modal-container {
+  left: 0;
+  overflow: auto;
+  padding: 20px 20px 20px 20px;
+  position: absolute;
+  top: 0;
+}
+
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.6);
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
