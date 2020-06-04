@@ -1,13 +1,9 @@
 import io from 'socket.io-client';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Share from "./components/share";
 
-import '../css/game.scss';
-
-const Index = () => {
-  return <div>Welcome to React!</div>;
-};
-ReactDOM.render(<Index />, document.getElementById('root'));
+ReactDOM.render(<Share />, document.getElementById('root'));
 
 const socket = io();
 
@@ -35,17 +31,6 @@ socket.on('status', (data) => {
 socket.on('issue', (data) => {
   console.log(data);
 });
-
-var copy = function() {
-  var copyText = document.querySelector("#game-link");
-  copyText.select();
-  document.execCommand("copy");
-
-  document.querySelector("#copy-game-link").value = "Copied";
-  setTimeout(function(){
-    document.querySelector("#copy-game-link").value = "Copy";
-  }, 3000);
-}
 
 var getGameId = function() {
   return window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
