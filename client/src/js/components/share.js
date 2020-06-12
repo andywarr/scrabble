@@ -4,8 +4,8 @@ import ReactDOM from "react-dom";
 import '../../css/game.scss';
 
 class Share extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.copy = this.copy.bind(this);
   }
@@ -22,16 +22,17 @@ class Share extends Component {
   }
 
   render() {
+    console.log("render", this.props.isVisible);
     return (
       <div>
-        <div className="modal-overlay closed" id="modal-overlay"></div>
+        <div className={this.props.isVisible ? "modal-overlay" : "modal-overlay closed"} id="modal-overlay"></div>
 
-        <div className="modal closed" id="share-modal">
+        <div className={this.props.isVisible ? "modal" : "modal closed"} id="share-modal">
           <div className="modal-container">
             <h1>Share</h1>
             <p>Send the link below with up to three friend. You will be able to play the game once others join.</p>
             <form id="game-link-container">
-              <input id="game-link" type="text" value="Loading..." readOnly />
+              <input id="game-link" type="text" value={window.location.href} readOnly />
               <input id="copy-game-link" value="Copy" type="button" onClick={this.copy} />
             </form>
           </div>
