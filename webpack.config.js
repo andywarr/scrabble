@@ -3,14 +3,12 @@ const path = require('path');
 
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./client/src/game.html",
-  filename: "../game.html",
-  chunks: ['game']
+  filename: "../index.html",
 });
 
 module.exports = {
   entry: {
     game: "./client/src/js/game.js",
-    index: "./client/src/js/index.js",
   },
   output: {
     path: path.join(__dirname, 'client/dist/js'),

@@ -16,17 +16,12 @@ body {
 
 .container > * {
   flex: 1;
+  margin: auto;
   max-width: 900px;
 }
 
-#hero {
-  background: url(/static/images/background.png) no-repeat top;
-  background-size: 100%;
-  height: 500px;
-}
-
 html {
-  color: #fff;
+  color: #FFEBEE;
   font-family: 'Roboto', sans-serif;
   height: 100%;
   width: 100%;

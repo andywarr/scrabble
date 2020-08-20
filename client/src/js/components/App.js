@@ -1,14 +1,15 @@
 import io from 'socket.io-client';
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
+
+// Import components
 import Share from "./Share";
+import Start from "./Start";
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {status: "Staged"};
-
-    this.setUp();
+    this.state = {status: "Start"};
   }
 
   getGameId() {
@@ -19,7 +20,7 @@ class App extends Component {
     return socket.id;
   }
 
-  setUp() {
+  connect() {
     const socket = io();
 
     socket.on('connect', () => {
@@ -42,9 +43,18 @@ class App extends Component {
     });
   }
 
-  shareModalVisible() {
-    console.log("shareModalVisible", this.state.status);
+  shareVisible() {
+    console.log("shareVisible", this.state.status);
     if (this.state.status === "Staged") {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  startVisible() {
+    console.log("startVisible", this.state.status);
+    if (this.state.status === "Start") {
       return true;
     } else {
       return false;
@@ -53,7 +63,10 @@ class App extends Component {
 
   render() {
     return (
-        <Share isVisible={this.shareModalVisible()} />
+      <div>
+        <Start isVisible={this.startVisible()} />
+        <Share isVisible={this.shareVisible()} />
+      </div>
     );
   }
 }
