@@ -9,6 +9,10 @@
   background: #555;
 }
 
+.draggable {
+  cursor: move;
+}
+
 #game-link {
   background: transparent;
   border: none;
@@ -31,7 +35,7 @@
 }
 
 html {
-  background-color: #fefefe;
+  background-color: #333333;
   font-family: 'Roboto', sans-serif;
 }
 
@@ -71,4 +75,8 @@ html {
   top: 0;
   width: 100%;
   z-index: 1000;
+}
+
+#start-container {
+
 }
