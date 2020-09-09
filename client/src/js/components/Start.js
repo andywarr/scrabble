@@ -3,8 +3,6 @@ import ReactDOM from "react-dom";
 
 import '../../css/game.scss';
 
-let that;
-
 class Start extends Component {
   constructor(props) {
     super(props);
@@ -97,6 +95,8 @@ class Start extends Component {
     let x = e.clientX;
     let y = e.clientY;
 
+    let play = false;
+
     let board_tiles = this.ref.current.getElementById('Board').childNodes;
 
     // Default
@@ -110,6 +110,8 @@ class Start extends Component {
         if (x >= dimens.left && x <= dimens.right && y >= dimens.top && y <= dimens.bottom) {
           this.x = dimens.left - this.originX + ((dimens.width - this.size)/2);
           this.y = dimens.top - this.originY + ((dimens.width - this.size)/2);
+
+          play = true;
         }
       }
     });
@@ -128,6 +130,12 @@ class Start extends Component {
     this.y = null;
 
     this.tile = null;
+
+    if (play) {
+      setTimeout(function() {
+        // DO SOMETHING!!!
+      }.bind(this), 1500);
+    }
   }
 
   render() {

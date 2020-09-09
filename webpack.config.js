@@ -1,21 +1,28 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const path = require('path');
 
-const htmlPlugin = new HtmlWebPackPlugin({
-  template: "./client/src/game.html",
-  filename: "../index.html",
-});
-
 module.exports = {
   entry: {
-    game: "./client/src/js/game.js",
+    index: "./client/src/js/index.js",
+    game: "./client/src/js/game.js"
   },
   output: {
     path: path.join(__dirname, 'client/dist/js'),
     filename: "[name].js",
     publicPath: '/static/js'
   },
-  plugins: [htmlPlugin],
+  plugins: [
+    new HtmlWebPackPlugin({
+      chunks: ['index'],
+      filename: "../index.html",
+      template: "./client/src/template.html"
+    }),
+    new HtmlWebPackPlugin({
+      chunks: ['game'],
+      filename: "../game.html",
+      template: "./client/src/template.html"
+    })
+  ],
   module: {
     rules: [
       {

@@ -4,12 +4,10 @@ import ReactDOM from "react-dom";
 
 // Import components
 import Share from "./Share";
-import Start from "./Start";
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {status: "Start"};
   }
 
   getGameId() {
@@ -52,19 +50,9 @@ class App extends Component {
     }
   }
 
-  startVisible() {
-    console.log("startVisible", this.state.status);
-    if (this.state.status === "Start") {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   render() {
     return (
       <div>
-        <Start isVisible={this.startVisible()} />
         <Share isVisible={this.shareVisible()} />
       </div>
     );

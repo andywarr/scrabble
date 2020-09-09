@@ -22,7 +22,6 @@ class Share extends Component {
   }
 
   render() {
-    console.log("render", this.props.isVisible);
     return (
       <div>
         <div className={this.props.isVisible ? "modal-overlay" : "modal-overlay closed"} id="modal-overlay"></div>
