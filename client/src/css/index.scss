@@ -1,0 +1,24 @@
+body {
+  height: inherit;
+  margin: 0;
+  width: inherit;
+}
+
+.draggable {
+  cursor: move;
+}
+
+html {
+  background-color: #333333;
+  font-family: 'Roboto', sans-serif;
+  height: 100vh;
+  width: 100vw;
+}
+
+#root {
+  align-items: center;
+  display: flex;
+  height: inherit;
+  justify-content: center;
+  width: inherit;
+}

@@ -7,6 +7,10 @@ var path = require('path');
 const Games = require('./games.js');
 const Player = require('./player.js');
 
+const READY = 0;
+const SET = 1;
+const GO = 2;
+
 var games = new Games();
 
 app.use('/static', express.static('./client/dist'));
@@ -40,7 +44,7 @@ io.on('connection', (socket) => {
         game.addPlayer(player);
 
         if (game.getNumberOfPlayers() >= 2) {
-          game.status = 'Ready';
+          game.status = SET;
         }
 
         game.updateStatus();
@@ -57,21 +61,21 @@ io.on('connection', (socket) => {
       game.removePlayer(player.id);
     }
 
-    if (game.status === 'Staged') {
+    if (game.status === READY) {
       if (game.getNumberOfPlayers() === 0) {
         // Remove game
         games.removeGame(game.id);
       }
-    } else if (game.status === 'Ready') {
+    } else if (game.status === SET) {
       if (game.getNumberOfPlayers() === 0) {
         // Remove game
         games.removeGame(game.id);
       } else if (game.getNumberOfPlayers() === 1) {
         // Change status to staged
-        game.status = 'Staged';
+        game.status = READY;
         game.updateStatus();
       }
-    }  else if (game.status === 'Playing') {
+    }  else if (game.status === GO) {
       if (game.getNumberOfPlayers() === 0) {
         // Remove game
         games.removeGame(game.id);

@@ -5,9 +5,18 @@ import ReactDOM from "react-dom";
 // Import components
 import Share from "./Share";
 
+// Constants
+import { status } from '../config.js';
+
 class App extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      status: status.READY
+    };
+
+    this.connect();
   }
 
   getGameId() {
@@ -41,19 +50,10 @@ class App extends Component {
     });
   }
 
-  shareVisible() {
-    console.log("shareVisible", this.state.status);
-    if (this.state.status === "Staged") {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   render() {
     return (
       <div>
-        <Share isVisible={this.shareVisible()} />
+        <Share status={this.state.status} />
       </div>
     );
   }

@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 
+import { status } from '../config.js';
+
 import '../../css/game.scss';
 
 class Share extends Component {
@@ -21,12 +23,22 @@ class Share extends Component {
     }, 3000);
   }
 
+  isVisible() {
+    let visible = false;
+
+    if (this.props.status === status.READY) {
+      visible = true;
+    }
+
+    return visible;
+  }
+
   render() {
     return (
-      <div>
-        <div className={this.props.isVisible ? "modal-overlay" : "modal-overlay closed"} id="modal-overlay"></div>
+      <div className={this.isVisible() ? "" : "closed"}>
+        <div className="modal-overlay" id="modal-overlay"></div>
 
-        <div className={this.props.isVisible ? "modal" : "modal closed"} id="share-modal">
+        <div className="modal" id="share-modal">
           <div className="modal-container">
             <h1>Share</h1>
             <p>Send the link below with up to three friend. You will be able to play the game once others join.</p>

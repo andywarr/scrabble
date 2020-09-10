@@ -6,7 +6,7 @@ class Game {
   constructor(id) {
     this.#id = id;
     this.#players = [];
-    this.#status = 'Staged'
+    this.#status = 0;
   }
 
   addPlayer(player) {
