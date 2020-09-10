@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 
 // Import components
+import Game from "./Game";
 import Share from "./Share";
 
 // Constants
@@ -54,6 +55,7 @@ class App extends Component {
     return (
       <div>
         <Share status={this.state.status} />
+        <Game />
       </div>
     );
   }

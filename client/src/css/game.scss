@@ -2,6 +2,17 @@ body {
   margin: 0;
 }
 
+#board-container {
+  padding: 20px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex: 1;
+}
+
 #copy-game-link {
   background: transparent;
   border: none;
@@ -15,6 +26,13 @@ body {
 
 .draggable {
   cursor: move;
+}
+
+#game-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
 }
 
 #game-link {
