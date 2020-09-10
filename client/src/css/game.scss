@@ -1,8 +1,9 @@
 body {
+  color: #FEFEFE;
   margin: 0;
 }
 
-#board-container {
+#board-container, #player-container {
   padding: 20px;
 }
 
@@ -97,4 +98,24 @@ html {
   top: 0;
   width: 100%;
   z-index: 1000;
+}
+
+.player {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.player-profile-image {
+  height: 50px;
+  margin-right: 20px;
+  width: 50px;
+}
+
+#players {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }

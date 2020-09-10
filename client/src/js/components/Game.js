@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 
+// Import components
+import Players from "./Players";
+
 import '../../css/game.scss';
 
 class Game extends Component {
@@ -457,7 +460,7 @@ class Game extends Component {
         </svg>
         </div>
         <div id="player-container" className="column">
-          Players
+          <Players players={[{name: "Player 1", score: 0}, {name: "Player 2", score: 0}]} />
         </div>
       </div>
     );
