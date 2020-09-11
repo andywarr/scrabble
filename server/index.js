@@ -47,6 +47,7 @@ io.on('connection', (socket) => {
           game.status = SET;
         }
 
+        game.updatePlayers();
         game.updateStatus();
     } else {
       // Maximum number of players

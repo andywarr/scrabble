@@ -460,7 +460,7 @@ class Game extends Component {
         </svg>
         </div>
         <div id="player-container" className="column">
-          <Players players={[{name: "Player 1", score: 0}, {name: "Player 2", score: 0}]} />
+          <Players players={this.props.players} />
         </div>
       </div>
     );

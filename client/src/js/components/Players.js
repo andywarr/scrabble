@@ -14,9 +14,10 @@ class Players extends Component {
   render() {
     return (
       <ul id="players">
-        {this.props.players.map((player) =>
-          <Player name={player.name}
-                  key={player.name}
+        {this.props.players.map((player, index) =>
+          <Player index={index + 1}
+                  key={player.id}
+                  name={player.name}
                   score={player.score} />
         )}
     </ul>

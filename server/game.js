@@ -41,6 +41,10 @@ class Game {
     return this.players.find(player => player.id === id);
   }
 
+  getPlayers() {
+    return this.players.map(player => player.getPlayer())
+  }
+
   removePlayer(id) {
     console.log("Removing player", id);
     this.players = this.players.filter(player => player.id !== id);
@@ -52,6 +56,11 @@ class Game {
 
   set status(status) {
     this.#status = status;
+  }
+
+  updatePlayers() {
+    console.log("Updating players");
+    this.players.forEach(player => player.socket.emit('players', { players: this.getPlayers() }));
   }
 
   updateStatus() {

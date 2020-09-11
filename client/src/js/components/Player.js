@@ -19,7 +19,7 @@ class Player extends Component {
           </svg>
         </div>
         <div className="column">
-          <div>{this.props.name}</div>
+          <div>{this.props.name === "" ? "Player " + this.props.index : this.props.name}</div>
           <div>{this.props.score}</div>
         </div>
       </li>

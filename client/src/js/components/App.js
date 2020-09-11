@@ -14,6 +14,7 @@ class App extends Component {
     super(props);
 
     this.state = {
+      players: [],
       status: status.READY
     };
 
@@ -38,6 +39,14 @@ class App extends Component {
       socket.emit('game', { gameId: gameId });
     });
 
+    socket.on('players', (data) => {
+      console.log(data);
+
+      this.setState({
+        players: data.players
+      });
+    });
+
     socket.on('status', (data) => {
       console.log(data);
 
@@ -55,7 +64,7 @@ class App extends Component {
     return (
       <div>
         <Share status={this.state.status} />
-        <Game />
+        <Game players={this.state.players} />
       </div>
     );
   }
