@@ -460,7 +460,7 @@ class Game extends Component {
         </svg>
         </div>
         <div id="player-container" className="column">
-          <Players players={this.props.players} />
+          <Players playerId={this.props.playerId} players={this.props.players} setName={this.props.setName} />
         </div>
       </div>
     );

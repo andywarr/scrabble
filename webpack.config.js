@@ -2,6 +2,7 @@ const HtmlWebPackPlugin = require("html-webpack-plugin");
 const path = require('path');
 
 module.exports = {
+  watch: true,
   entry: {
     index: "./client/src/js/index.js",
     game: "./client/src/js/game.js"

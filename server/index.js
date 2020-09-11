@@ -55,6 +55,16 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('name', (data) => {
+    let name = data.name;
+
+    if (name) {
+      player.name = name;
+    }
+
+    game.updatePlayers();
+  });
+
   // Event emitted when a player exits a game
   socket.on('disconnect', () => {
     console.log('Player disconnected');

@@ -6,9 +6,22 @@ import '../../css/game.scss';
 class Player extends Component {
   constructor(props) {
     super(props);
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event) {
+    this.props.setName(event.target.value);
   }
 
   render() {
+    let name;
+    if (this.props.id === this.props.playerId) {
+      name = <input type="text" className="player-name editable" value={this.props.name === "" ? "Player " + this.props.index + " (YOU)" : this.props.name} onChange={this.handleChange} />;
+    } else {
+      name = <input type="text" className="player-name" value={this.props.name === "" ? "Player " + this.props.index : this.props.name} readOnly />;;
+    }
+
     return (
       <li className="player">
         <div className="player-profile-image">
@@ -19,7 +32,7 @@ class Player extends Component {
           </svg>
         </div>
         <div className="column">
-          <div>{this.props.name === "" ? "Player " + this.props.index : this.props.name}</div>
+          {name}
           <div>{this.props.score}</div>
         </div>
       </li>

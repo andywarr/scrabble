@@ -108,6 +108,23 @@ html {
   width: 100%;
 }
 
+.player-name {
+  background-color: #333;
+  border: 1px solid #333;
+  color: #FEFEFE;
+  font-size: 1.25rem;
+  height: 25px;
+  margin-bottom: 5px;
+  outline: none;
+  padding: 0;
+  width: 200px;
+}
+
+.player-name:focus.editable, .player-name:hover.editable {
+   border: 1px solid #FEFEFE;
+   box-shadow: 0 0 5px #FEFEFE;
+}
+
 .player-profile-image {
   height: 50px;
   margin-right: 20px;

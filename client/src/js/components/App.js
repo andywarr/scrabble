@@ -13,7 +13,11 @@ class App extends Component {
   constructor(props) {
     super(props);
 
+    this.socket;
+
     this.state = {
+      gameId: "",
+      playerId: "",
       players: [],
       status: status.READY
     };
@@ -29,17 +33,27 @@ class App extends Component {
     return socket.id;
   }
 
+  setName(name) {
+    console.log(name);
+    this.socket.emit('name', { name: name });
+  }
+
   connect() {
-    const socket = io();
+    this.socket = io();
 
-    socket.on('connect', () => {
+    this.socket.on('connect', () => {
       var gameId = this.getGameId();
-      var playerId = this.getPlayerId(socket);
+      var playerId = this.getPlayerId(this.socket);
 
-      socket.emit('game', { gameId: gameId });
+      this.setState({
+        gameId: gameId,
+        playerId: playerId
+      });
+
+      this.socket.emit('game', { gameId: gameId });
     });
 
-    socket.on('players', (data) => {
+    this.socket.on('players', (data) => {
       console.log(data);
 
       this.setState({
@@ -47,15 +61,13 @@ class App extends Component {
       });
     });
 
-    socket.on('status', (data) => {
-      console.log(data);
-
+    this.socket.on('status', (data) => {
       this.setState({
         status: data.status
       });
     });
 
-    socket.on('issue', (data) => {
+    this.socket.on('issue', (data) => {
       console.log(data);
     });
   }
@@ -64,7 +76,7 @@ class App extends Component {
     return (
       <div>
         <Share status={this.state.status} />
-        <Game players={this.state.players} />
+        <Game playerId={this.state.playerId} players={this.state.players} setName={this.setName.bind(this)} />
       </div>
     );
   }

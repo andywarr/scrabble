@@ -15,10 +15,13 @@ class Players extends Component {
     return (
       <ul id="players">
         {this.props.players.map((player, index) =>
-          <Player index={index + 1}
+          <Player id={player.id}
+                  index={index + 1}
                   key={player.id}
                   name={player.name}
-                  score={player.score} />
+                  playerId={this.props.playerId}
+                  score={player.score}
+                  setName={this.props.setName} />
         )}
     </ul>
     );
