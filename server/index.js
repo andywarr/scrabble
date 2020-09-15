@@ -69,10 +69,11 @@ io.on('connection', (socket) => {
     let status = data.status;
 
     if (status === GO) {
+      game.status = GO;
       // START GAME
     }
 
-    game.updatePlayers();
+    game.updateStatus();
   });
 
   // Event emitted when a player exits a game

@@ -42,7 +42,7 @@ class App extends Component {
 
   setStatus(status) {
     console.log(status);
-    this.socket.emit('status', { name: status });
+    this.socket.emit('status', { status: status });
   }
 
   connect() {
