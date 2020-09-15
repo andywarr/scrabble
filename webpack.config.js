@@ -10,7 +10,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'client/dist/js'),
     filename: "[name].js",
-    publicPath: '/static/js'
+    publicPath: '/js'
   },
   plugins: [
     new HtmlWebPackPlugin({
