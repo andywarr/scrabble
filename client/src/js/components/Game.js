@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 
 // Import components
 import Players from "./Players";
+import Set from "./Set";
 
 import '../../css/game.scss';
 
@@ -461,6 +462,7 @@ class Game extends Component {
         </div>
         <div id="player-container" className="column">
           <Players playerId={this.props.playerId} players={this.props.players} setName={this.props.setName} />
+          <Set setStatus={this.props.setStatus} status={this.props.status} />
         </div>
       </div>
     );

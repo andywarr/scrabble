@@ -22,6 +22,9 @@ class App extends Component {
       status: status.READY
     };
 
+    this.setName = this.setName.bind(this);
+    this.setStatus = this.setStatus.bind(this);
+
     this.connect();
   }
 
@@ -36,6 +39,11 @@ class App extends Component {
   setName(name) {
     console.log(name);
     this.socket.emit('name', { name: name });
+  }
+
+  setStatus(status) {
+    console.log(status);
+    this.socket.emit('status', { name: status });
   }
 
   connect() {
@@ -54,8 +62,6 @@ class App extends Component {
     });
 
     this.socket.on('players', (data) => {
-      console.log(data);
-
       this.setState({
         players: data.players
       });
@@ -76,7 +82,7 @@ class App extends Component {
     return (
       <div>
         <Share status={this.state.status} />
-        <Game playerId={this.state.playerId} players={this.state.players} setName={this.setName.bind(this)} />
+        <Game playerId={this.state.playerId} players={this.state.players} setName={this.setName} setStatus={this.setStatus} status={this.state.status} />
       </div>
     );
   }
