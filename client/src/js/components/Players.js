@@ -1,31 +1,23 @@
-import React, { Component } from "react";
-import ReactDOM from "react-dom";
+import React from 'react';
 
 // Import components
 import Player from "./Player";
 
 import '../../css/game.scss';
 
-class Players extends Component {
-  constructor(props) {
-    super(props);
-  }
+export default function Players(props) {
 
-  render() {
-    return (
-      <ul id="players">
-        {this.props.players.map((player, index) =>
-          <Player id={player.id}
-                  index={index + 1}
-                  key={player.id}
-                  name={player.name}
-                  playerId={this.props.playerId}
-                  score={player.score}
-                  setName={this.props.setName} />
-        )}
+  return (
+    <ul id="players">
+      {props.players.map((player, index) =>
+        <Player id={player.id}
+                index={index + 1}
+                key={player.id}
+                name={player.name}
+                playerId={props.playerId}
+                score={player.score}
+                setName={props.setName} />
+      )}
     </ul>
-    );
-  }
+  );
 }
-
-export default Players;
