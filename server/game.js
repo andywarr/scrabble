@@ -1,16 +1,19 @@
 class Game {
   #id;
+  #playerTurnIndex;
   #players;
   #status;
 
   constructor(id) {
     this.#id = id;
+    this.#playerTurnIndex;
     this.#players = [];
     this.#status = 0;
   }
 
   addPlayer(player) {
     if (!this.doesPlayerExist(player.id)) {
+      console.log("Adding player", player.id);
       this.players.push(player);
     }
   }
@@ -24,12 +27,20 @@ class Game {
     return this.#id;
   }
 
+  get playerTurnIndex() {
+    return this.#playerTurnIndex;
+  }
+
   get players() {
     return this.#players;
   }
 
   get status() {
     return this.#status;
+  }
+
+  getPlayerTurn() {
+    return this.players[this.playerTurnIndex];
   }
 
   getNumberOfPlayers() {
@@ -50,12 +61,32 @@ class Game {
     this.players = this.players.filter(player => player.id !== id);
   }
 
+  set playerTurnIndex(playerTurnIndex) {
+    this.#playerTurnIndex = playerTurnIndex;
+  }
+
   set players(players) {
     this.#players = players;
   }
 
   set status(status) {
     this.#status = status;
+  }
+
+  updatePlayerTurn() {
+    if (this.playerTurnIndex  === undefined) {
+      this.#playerTurnIndex = 0;
+    }
+    else if (this.playerTurnIndex + 1 < this.getNumberOfPlayers() - 1) {
+      this.playerTurnIndex = this.playerTurnIndex + 1
+    }
+    else {
+      this.#playerTurnIndex = 0;
+    }
+
+    let turn = this.players[this.playerTurnIndex].id;
+    console.log("Updating player turn", turn);
+    this.players.forEach(player => player.socket.emit('turn', { turn: turn }));
   }
 
   updatePlayers() {

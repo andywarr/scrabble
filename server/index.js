@@ -71,6 +71,7 @@ io.on('connection', (socket) => {
     if (status === GO) {
       game.status = GO;
       // START GAME
+      game.updatePlayerTurn();
     }
 
     game.updateStatus();

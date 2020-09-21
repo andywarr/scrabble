@@ -72,6 +72,10 @@ class App extends Component {
       });
     });
 
+    this.socket.on('turn', (data) => {
+      console.log("turn", data);
+    });
+
     this.socket.on('issue', (data) => {
       console.log(data);
     });
@@ -88,78 +92,3 @@ class App extends Component {
 }
 
 export default App;
-
-// import io from 'socket.io-client';
-// import React, { useEffect, useState } from "react";
-//
-// // Import components
-// import Game from "./Game";
-// import Share from "./Share";
-//
-// // Constants
-// import { status } from '../config.js';
-//
-// export default function App(props) {
-//
-//   const [gameId, setGameId] = useState(null);
-//   const [playerId, setPlayerId] = useState(null);
-//   const [players, setPlayers] = useState([]);
-//   const [gameStatus, setGameStatus] = useState(status.READY);
-//
-//   let socket = null;
-//
-//   function getGameId() {
-//     return window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
-//   }
-//
-//   function getPlayerId(socket) {
-//     return socket.id;
-//   }
-//
-//   function emitName(name) {
-//     socket.emit('name', { name: name });
-//   }
-//
-//   function emitStatus(status) {
-//     socket.emit('status', { name: status });
-//   }
-//
-//   function connect() {
-//     //setSocket(io());
-//
-//     socket = io();
-//
-//     socket.on('connect', () => {
-//       var gameId = getGameId();
-//       var playerId = getPlayerId(socket);
-//
-//       setGameId(gameId);
-//       setPlayerId(playerId);
-//
-//       socket.emit('game', { gameId: gameId });
-//     });
-//
-//     socket.on('players', (data) => {
-//       setPlayers(data.players);
-//     });
-//
-//     socket.on('status', (data) => {
-//       setGameStatus(data.status);
-//     });
-//
-//     socket.on('issue', (data) => {
-//       console.log(data);
-//     });
-//   }
-//
-//   useEffect(() => {
-//     connect();
-//   });
-//
-//   return (
-//     <div>
-//       <Share status={status} />
-//       <Game playerId={playerId} players={players} setName={emitName} setGameStatus={emitStatus} status={status} />
-//     </div>
-//   );
-// }
