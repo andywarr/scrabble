@@ -31,6 +31,11 @@ io.on('connection', (socket) => {
   var player = new Player(socket);
   var game = null;
 
+  socket.on('done', () => {
+    console.log('Player turn complete');
+    game.updatePlayerTurn();
+  });
+
   socket.on('game', (data) => {
     var gameId = data.gameId;
     game = games.getGame(gameId);

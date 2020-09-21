@@ -3,6 +3,7 @@ import React from "react";
 // Import components
 import Players from "./Players";
 import Set from "./Set";
+import Turn from "./Turn";
 
 import '../../css/game.scss';
 
@@ -456,8 +457,9 @@ export default function Game(props) {
       </svg>
       </div>
       <div id="player-container" className="column">
-        <Players playerId={props.playerId} players={props.players} setName={props.setName} />
+        <Players playerId={props.playerId} players={props.players} setName={props.setName} turn={props.turn} />
         <Set setStatus={props.setStatus} status={props.status} />
+        <Turn done={props.done} playerId={props.playerId} status={props.status} turn={props.turn} />
       </div>
     </div>
   );

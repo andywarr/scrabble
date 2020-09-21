@@ -77,7 +77,7 @@ class Game {
     if (this.playerTurnIndex  === undefined) {
       this.#playerTurnIndex = 0;
     }
-    else if (this.playerTurnIndex + 1 < this.getNumberOfPlayers() - 1) {
+    else if (this.playerTurnIndex + 1 < this.getNumberOfPlayers()) {
       this.playerTurnIndex = this.playerTurnIndex + 1
     }
     else {

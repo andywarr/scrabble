@@ -21,10 +21,16 @@ class App extends Component {
       status: status.READY
     };
 
+    this.done = this.done.bind(this);
     this.setName = this.setName.bind(this);
     this.setStatus = this.setStatus.bind(this);
 
     this.connect();
+  }
+
+  done() {
+    console.log('Player turn complete');
+    this.socket.emit('done');
   }
 
   getGameId() {
@@ -73,7 +79,9 @@ class App extends Component {
     });
 
     this.socket.on('turn', (data) => {
-      console.log("turn", data);
+      this.setState({
+        turn: data.turn
+      });
     });
 
     this.socket.on('issue', (data) => {
@@ -85,7 +93,7 @@ class App extends Component {
     return (
       <div>
         <Share status={this.state.status} />
-        <Game playerId={this.state.playerId} players={this.state.players} setName={this.setName} setStatus={this.setStatus} status={this.state.status} />
+        <Game done={this.done} playerId={this.state.playerId} players={this.state.players} setName={this.setName} setStatus={this.setStatus} status={this.state.status} turn={this.state.turn} />
       </div>
     );
   }
