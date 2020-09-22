@@ -34,6 +34,7 @@ io.on('connection', (socket) => {
   socket.on('done', () => {
     console.log('Player turn complete');
     game.updatePlayerTurn();
+    game.drawTiles();
   });
 
   socket.on('game', (data) => {
@@ -77,6 +78,7 @@ io.on('connection', (socket) => {
       game.status = GO;
       // START GAME
       game.updatePlayerTurn();
+      game.drawTiles();
     }
 
     game.updateStatus();

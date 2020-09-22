@@ -1,14 +1,18 @@
+const tiles = require('./tiles.js').tiles;
+
 class Game {
   #id;
   #playerTurnIndex;
   #players;
   #status;
+  #tiles;
 
   constructor(id) {
     this.#id = id;
     this.#playerTurnIndex;
     this.#players = [];
     this.#status = 0;
+    this.#tiles = tiles;
   }
 
   addPlayer(player) {
@@ -21,6 +25,27 @@ class Game {
   doesPlayerExist(id) {
     console.log("Finding player", id);
     return this.players.includes(player => player.id === id);
+  }
+
+  drawTiles() {
+    const tilesNeeded = 7 - this.players[this.playerTurnIndex].getNumberOfTiles();
+    const newTiles = [...this.tiles];
+    let selectedTiles = [];
+    let numberOfTilesToDraw = tilesNeeded;
+
+    if (tilesNeeded > newTiles.length) {
+      numberOfTilesToDraw = newTiles.length;
+    }
+
+    while (numberOfTilesToDraw--) {
+      let rand = Math.floor(Math.random() * newTiles.length);
+      selectedTiles.push(newTiles.splice(rand, 1));
+    }
+
+    this.tiles = newTiles;
+
+    console.log("Number of tiles remaining", this.tiles.length);
+    console.log("Number of selected tiles", selectedTiles.length);
   }
 
   get id() {
@@ -37,6 +62,10 @@ class Game {
 
   get status() {
     return this.#status;
+  }
+
+  get tiles() {
+    return this.#tiles;
   }
 
   getPlayerTurn() {
@@ -71,6 +100,10 @@ class Game {
 
   set status(status) {
     this.#status = status;
+  }
+
+  set tiles(tiles) {
+    this.#tiles = tiles;
   }
 
   updatePlayerTurn() {

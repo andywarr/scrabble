@@ -3,12 +3,14 @@ class Player {
   #name;
   #score;
   #socket;
+  #tiles;
 
   constructor(socket) {
     this.#id = socket.id;
     this.#name = "";
     this.#score = 0;
     this.#socket = socket;
+    this.#tiles = [];
   }
 
   get id() {
@@ -17,6 +19,10 @@ class Player {
 
   get name() {
     return this.#name;
+  }
+
+  getNumberOfTiles() {
+    return this.#tiles.length;
   }
 
   getPlayer() {
