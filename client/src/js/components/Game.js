@@ -17,8 +17,8 @@ export default function Game(props) {
       let tile = game.current.getElementById(slot.tile_id);
 
       if (tile !== null) {
-        let x = _slot.x.baseVal.value;
-        let y = _slot.y.baseVal.value;
+        let x = _slot.x.baseVal.value + ((_slot.width.baseVal.value - tile.childNodes[0].width.baseVal.value)/2);
+        let y = _slot.y.baseVal.value + ((_slot.width.baseVal.value - tile.childNodes[0].width.baseVal.value)/2);
 
         let transforms = tile.transform.baseVal;
 
