@@ -17,6 +17,16 @@ class App extends Component {
     this.state = {
       gameId: "",
       playerId: "",
+      playerTiles: [],
+      playerTray: [
+        {id: "slot_1", tile_id: null},
+        {id: "slot_2", tile_id: null},
+        {id: "slot_3", tile_id: null},
+        {id: "slot_4", tile_id: null},
+        {id: "slot_5", tile_id: null},
+        {id: "slot_6", tile_id: null},
+        {id: "slot_7", tile_id: null},
+      ],
       players: [],
       status: status.READY
     };
@@ -26,6 +36,37 @@ class App extends Component {
     this.setStatus = this.setStatus.bind(this);
 
     this.connect();
+  }
+
+  arrangeTiles() {
+    this.state.playerTiles.forEach((tile) => {
+      if (!this.isTileInTray(tile)) {
+        this.addTileToTray(tile);
+      }
+    });
+
+    console.log(this.state.playerTray);
+  }
+
+  addTileToTray(tile) {
+    for (let slot of this.state.playerTray) {
+      if (slot.tile_id === null) {
+        slot.tile_id = tile.id;
+        return;
+      }
+    }
+  }
+
+  isTileInTray(tile) {
+    let tileInTray = false;
+
+    this.state.playerTray.forEach((slot) => {
+      if (slot.tile_id === tile.id) {
+        tileInTray = true;
+      }
+    });
+
+    return tileInTray;
   }
 
   done() {
@@ -78,6 +119,14 @@ class App extends Component {
       });
     });
 
+    this.socket.on('tiles', (data) => {
+      this.setState({
+        playerTiles: data.tiles
+      });
+
+      this.arrangeTiles();
+    });
+
     this.socket.on('turn', (data) => {
       this.setState({
         turn: data.turn
@@ -93,7 +142,7 @@ class App extends Component {
     return (
       <div>
         <Share status={this.state.status} />
-        <Game done={this.done} playerId={this.state.playerId} players={this.state.players} setName={this.setName} setStatus={this.setStatus} status={this.state.status} turn={this.state.turn} />
+        <Game done={this.done} playerId={this.state.playerId} playerTray={this.state.playerTray} players={this.state.players} setName={this.setName} setStatus={this.setStatus} status={this.state.status} turn={this.state.turn} />
       </div>
     );
   }

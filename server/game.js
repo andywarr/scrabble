@@ -28,24 +28,25 @@ class Game {
   }
 
   drawTiles() {
-    const tilesNeeded = 7 - this.players[this.playerTurnIndex].getNumberOfTiles();
-    const newTiles = [...this.tiles];
+    const gameTiles = [...this.tiles];
+    const playerTiles = [...this.players[this.playerTurnIndex].tiles];
+    const tilesNeeded = 7 - playerTiles.length;
     let selectedTiles = [];
     let numberOfTilesToDraw = tilesNeeded;
 
-    if (tilesNeeded > newTiles.length) {
-      numberOfTilesToDraw = newTiles.length;
+    if (tilesNeeded > gameTiles.length) {
+      numberOfTilesToDraw = gameTiles.length;
     }
 
     while (numberOfTilesToDraw--) {
-      let rand = Math.floor(Math.random() * newTiles.length);
-      selectedTiles.push(newTiles.splice(rand, 1));
+      let rand = Math.floor(Math.random() * gameTiles.length);
+      selectedTiles.push(...gameTiles.splice(rand, 1));
     }
 
-    this.tiles = newTiles;
+    this.tiles = gameTiles;
+    this.players[this.playerTurnIndex].tiles = [...playerTiles, ...selectedTiles];
 
-    console.log("Number of tiles remaining", this.tiles.length);
-    console.log("Number of selected tiles", selectedTiles.length);
+    this.players[this.playerTurnIndex].updatePlayerTiles();
   }
 
   get id() {

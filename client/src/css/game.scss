@@ -7,6 +7,10 @@ body {
   padding: 20px;
 }
 
+.closed {
+  display: none;
+}
+
 .column {
   display: flex;
   flex-direction: column;
@@ -76,10 +80,6 @@ html {
   transform: translate(-50%, -50%);
   width: 600px;
   z-index: 1010;
-}
-
-.closed {
-  display: none;
 }
 
 .modal-container {

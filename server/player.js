@@ -41,6 +41,10 @@ class Player {
     return this.#socket;
   }
 
+  get tiles() {
+    return this.#tiles;
+  }
+
   set id(id) {
     this.#id = id;
   }
@@ -55,6 +59,14 @@ class Player {
 
   set socket(socket) {
     this.#socket = socket;
+  }
+
+  set tiles(tiles) {
+    this.#tiles = tiles;
+  }
+
+  updatePlayerTiles() {
+    this.socket.emit('tiles', { tiles: this.tiles });
   }
 }
 
