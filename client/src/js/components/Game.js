@@ -11,7 +11,107 @@ export default function Game(props) {
 
   const game = useRef(null);
 
+  let boundary1;
+  let boundary2;
+
+  let tile;
+  let size;
+  let origin;
+  let offset;
+
+  function getMousePosition(x, y) {
+    let CTM = game.current.getScreenCTM();
+    return {
+      x: CTM.a * x + CTM.e,
+      y: CTM.d * y + CTM.f
+    };
+  }
+
+  function getSVGPosition(x, y) {
+    let CTM = game.current.getScreenCTM();
+    return {
+      x: (x - CTM.e) / CTM.a,
+      y: (y - CTM.f) / CTM.d
+    };
+  }
+
+  function handleMouseDown(e) {
+    console.log("MOUSE DOWN");
+    if (e.target.parentNode.classList.contains('draggable')) {
+      console.log("I CAN BE DRAGGED");
+
+      tile = e.target.parentNode;
+
+      let transforms = tile.transform.baseVal;
+
+      if (transforms.length === 0 ||
+        transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
+        let translate = game.current.createSVGTransform();
+        translate.setTranslate(0, 0);
+        tile.transform.baseVal.insertItemBefore(translate, 0);
+      }
+
+      let transform = transforms.getItem(0);
+
+      let tile_dimens = tile.getClientRects()[0];
+
+      let pos = getSVGPosition(e.clientX, e.clientY);
+      size = getSVGPosition(tile_dimens.width, tile_dimens.width).x * -1;
+      origin = getSVGPosition(tile_dimens.left, tile_dimens.top);
+      offset = {x: pos.x - origin.x, y: pos.y - origin.y}
+
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+  }
+
+  function handleMouseMove(e) {
+    console.log("MOUSE MOVE");
+
+    let pos = getSVGPosition(e.clientX, e.clientY);
+
+    let x;
+    let y;
+
+    if (pos.x <= offset.x + boundary1.x) {
+      x = boundary1.x;
+    }
+    else if (pos.x + size >= boundary2.x) {
+      x = boundary2.x - size - offset.x;
+    }
+    else {
+      x = pos.x - offset.x;
+    }
+
+    // Calculate Y coordinate
+    if (pos.y <= offset.y + boundary1.y) {
+      y = boundary1.y;
+    }
+    else if (pos.y + size >= boundary2.y) {
+      y = boundary2.y - size - offset.y;
+    }
+    else {
+      y = pos.y - offset.y;
+    }
+
+    console.log(pos.x, offset.x, boundary1.x, boundary2.x);
+    console.log(pos.y, offset.y, boundary1.y, boundary2.y);
+    console.log(size);
+
+    // Set X, Y coordinate
+    let attrValue = "translate(" + [x, y] + ")";
+    tile.setAttribute('transform', attrValue);
+  }
+
+  function handleMouseUp(e) {
+    console.log("MOUSE UP");
+    document.removeEventListener('mousemove', handleMouseMove);
+  }
+
   useEffect(() => {
+    boundary1 = getSVGPosition(game.current.getClientRects()[0].left, game.current.getClientRects()[0].top);
+    boundary2 = getSVGPosition(game.current.getClientRects()[0].right, game.current.getClientRects()[0].bottom);
+
     props.playerTray.forEach((slot) => {
       let _slot = game.current.getElementById(slot.id)
       let tile = game.current.getElementById(slot.tile_id);
@@ -33,6 +133,8 @@ export default function Game(props) {
         tile.setAttribute('transform', attrValue);
 
         tile.classList.remove("closed");
+
+        tile.addEventListener("mousedown", handleMouseDown);
       }
     });
   });

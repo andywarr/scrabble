@@ -41,11 +41,11 @@ class Start extends Component {
     if (e.target.parentNode.classList.contains('draggable')) {
       this.tile = e.target.parentNode;
 
-      var transforms = this.tile.transform.baseVal;
+      let transforms = this.tile.transform.baseVal;
 
       if (transforms.length === 0 ||
         transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
-        var translate = svg.createSVGTransform();
+        let translate = svg.createSVGTransform();
         translate.setTranslate(0, 0);
         this.tile.transform.baseVal.insertItemBefore(translate, 0);
       }

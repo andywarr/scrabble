@@ -44,8 +44,6 @@ class App extends Component {
         this.addTileToTray(tile);
       }
     });
-
-    console.log(this.state.playerTray);
   }
 
   addTileToTray(tile) {
