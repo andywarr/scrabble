@@ -81,12 +81,12 @@ class App extends Component {
   }
 
   setName(name) {
-    console.log(name);
+    console.log('Set name', name);
     this.socket.emit('name', { name: name });
   }
 
   setStatus(status) {
-    console.log(status);
+    console.log('Set status', status);
     this.socket.emit('status', { status: status });
   }
 
@@ -106,18 +106,21 @@ class App extends Component {
     });
 
     this.socket.on('players', (data) => {
+      console.log('players', data.players);
       this.setState({
         players: data.players
       });
     });
 
     this.socket.on('status', (data) => {
+      console.log('status', data.status);
       this.setState({
         status: data.status
       });
     });
 
     this.socket.on('tiles', (data) => {
+      console.log('tiles', data.tiles);
       this.setState({
         playerTiles: data.tiles
       });
@@ -126,13 +129,14 @@ class App extends Component {
     });
 
     this.socket.on('turn', (data) => {
+      console.log('turn', data.turn);
       this.setState({
         turn: data.turn
       });
     });
 
     this.socket.on('issue', (data) => {
-      console.log(data);
+      console.log('error', data);
     });
   }
 
