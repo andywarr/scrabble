@@ -19,14 +19,6 @@ export default function Game(props) {
   let origin;
   let offset;
 
-  function getMousePosition(x, y) {
-    let CTM = game.current.getScreenCTM();
-    return {
-      x: CTM.a * x + CTM.e,
-      y: CTM.d * y + CTM.f
-    };
-  }
-
   function getSVGPosition(x, y) {
     let CTM = game.current.getScreenCTM();
     return {
