@@ -27,31 +27,48 @@ export default function Game(props) {
     };
   }
 
+  function addTransforms(el) {
+    let translate = game.current.createSVGTransform();
+    translate.setTranslate(0, 0);
+    el.transform.baseVal.insertItemBefore(translate, 0);
+  }
+
+  function getSize(el) {
+    return el.childNodes[0].width.baseVal.value;
+  }
+
+  function hasTransforms(el) {
+    return el.transform.baseVal.length > 0 ||
+      el.transform.baseVal.getItem(0).type === SVGTransform.SVG_TRANSFORM_TRANSLATE;
+  }
+
   function isDraggable(el) {
     return el.parentNode.classList.contains('draggable');
   }
 
+  function isOccupied(el) {
+    return el.classList.contains('occupied');
+  }
+
+  function isTile(el) {
+    return el.parentNode.classList.contains('tile');
+  }
+
   function handleMouseDown(e) {
-    if (isDraggable(e.target)) {
+    if (isDraggable(e.target) && isTile(e.target)) {
+      // select the g element
       tile = e.target.parentNode;
 
-      let transforms = tile.transform.baseVal;
-
-      if (transforms.length === 0 ||
-        transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
-        let translate = game.current.createSVGTransform();
-        translate.setTranslate(0, 0);
-        tile.transform.baseVal.insertItemBefore(translate, 0);
+      if (!hasTransforms(tile)) {
+        addTransforms(tile);
       }
 
-      let transform = transforms.getItem(0);
-
-      let tile_dimens = tile.getClientRects()[0];
-
+      let dimens = tile.getClientRects()[0];
       let pos = getSVGPosition(e.clientX, e.clientY);
-      tile_size = getSVGPosition(tile_dimens.width, tile_dimens.width).x * -1;
-      origin = getSVGPosition(tile_dimens.left, tile_dimens.top);
-      offset = {x: pos.x - origin.x, y: pos.y - origin.y}
+
+      tile.size = getSize(tile);;
+      tile.origin = getSVGPosition(dimens.left, dimens.top);
+      tile.offset = {x: pos.x - tile.origin.x, y: pos.y - tile.origin.y}
 
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
@@ -64,25 +81,26 @@ export default function Game(props) {
     let x;
     let y;
 
-    if (pos.x <= offset.x + boundary1.x) {
+    // Calculate X coordinate
+    if (pos.x <= tile.offset.x + boundary1.x) {
       x = boundary1.x;
     }
-    else if (pos.x + tile_size >= boundary2.x) {
-      x = boundary2.x - tile_size - offset.x;
+    else if (pos.x + tile.size >= boundary2.x) {
+      x = boundary2.x - tile.size - tile.offset.x;
     }
     else {
-      x = pos.x - offset.x;
+      x = pos.x - tile.offset.x;
     }
 
     // Calculate Y coordinate
-    if (pos.y <= offset.y + boundary1.y) {
+    if (pos.y <= tile.offset.y + boundary1.y) {
       y = boundary1.y;
     }
-    else if (pos.y + tile_size >= boundary2.y) {
-      y = boundary2.y - tile_size - offset.y;
+    else if (pos.y + tile.size >= boundary2.y) {
+      y = boundary2.y - tile.size - tile.offset.y;
     }
     else {
-      y = pos.y - offset.y;
+      y = pos.y - tile.offset.y;
     }
 
     // Set X, Y coordinate
@@ -98,18 +116,19 @@ export default function Game(props) {
 
     let placed = false;
 
-    let board_tiles = game.current.getElementById('Board').childNodes;
+    let squares = game.current.getElementById('Board').childNodes;
 
-    board_tiles.forEach((board_tile) => {
-      if(!board_tile.classList.contains('occupied')) {
-        let board_tile_dimens = board_tile.getClientRects()[0];
-        let board_tile_pos = getSVGPosition(board_tile_dimens.x, board_tile_dimens.y);
+    squares.forEach((square) => {
+      if(!isOccupied(square)) {
+        square.dimens = square.getClientRects()[0];
+        square.pos = getSVGPosition(square.dimens.x, square.dimens.y);
+        square.size = getSize(square);
 
-        if (pos.x >= board_tile_pos.x && pos.x <= board_tile_pos.x + 100 && pos.y >= board_tile_pos.y && pos.y <= board_tile_pos.y + 100) {
-          x = board_tile_pos.x + ((board_tile.childNodes[0].width.baseVal.value - tile.childNodes[0].width.baseVal.value)/2);
-          y = board_tile_pos.y + ((board_tile.childNodes[0].width.baseVal.value - tile.childNodes[0].width.baseVal.value)/2);
+        if (pos.x >= square.pos.x && pos.x <= square.pos.x + square.size && pos.y >= square.pos.y && pos.y <= square.pos.y + square.size) {
+          x = square.pos.x + ((square.size - tile.size)/2);
+          y = square.pos.y + ((square.size - tile.size)/2);
 
-          board_tile.classList.add("occupied");
+          square.classList.add("occupied");
 
           placed = true;
         }
@@ -123,7 +142,7 @@ export default function Game(props) {
     }
     else {
       // Set X, Y coordinate
-      let attrValue = "translate(" + [origin.x, origin.y] + ")";
+      let attrValue = "translate(" + [tile.origin.x, tile.origin.y] + ")";
       tile.setAttribute('transform', attrValue);
     }
 
