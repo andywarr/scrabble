@@ -34,6 +34,7 @@ class App extends Component {
     this.done = this.done.bind(this);
     this.setName = this.setName.bind(this);
     this.setStatus = this.setStatus.bind(this);
+    this.updateBoard = this.updateBoard.bind(this);
 
     this.connect();
   }
@@ -82,12 +83,17 @@ class App extends Component {
 
   setName(name) {
     console.log('Set name', name);
-    this.socket.emit('name', { name: name });
+    this.socket.emit('name', { name });
   }
 
   setStatus(status) {
     console.log('Set status', status);
-    this.socket.emit('status', { status: status });
+    this.socket.emit('status', { status });
+  }
+
+  updateBoard(tile, square) {
+    console.log('Update board', tile, square);
+    this.socket.emit('update', { tile, square });
   }
 
   connect() {
@@ -135,6 +141,10 @@ class App extends Component {
       });
     });
 
+    this.socket.on('update', (data) => {
+      console.log('update', data);
+    });
+
     this.socket.on('issue', (data) => {
       console.log('error', data);
     });
@@ -144,7 +154,7 @@ class App extends Component {
     return (
       <div>
         <Share status={this.state.status} />
-        <Game done={this.done} playerId={this.state.playerId} playerTray={this.state.playerTray} players={this.state.players} setName={this.setName} setStatus={this.setStatus} status={this.state.status} turn={this.state.turn} />
+        <Game done={this.done} playerId={this.state.playerId} playerTray={this.state.playerTray} players={this.state.players} setName={this.setName} setStatus={this.setStatus} status={this.state.status} turn={this.state.turn} updateBoard={this.updateBoard} />
       </div>
     );
   }

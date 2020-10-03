@@ -84,6 +84,13 @@ io.on('connection', (socket) => {
     game.updateStatus();
   });
 
+  socket.on('update', (data) => {
+    let tile = data.tile;
+    let square = data.square;
+
+    game.updateBoard(tile, square);
+  });
+
   // Event emitted when a player exits a game
   socket.on('disconnect', () => {
     console.log('Player disconnected');

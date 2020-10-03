@@ -123,6 +123,11 @@ class Game {
     this.players.forEach(player => player.socket.emit('turn', { turn: turn }));
   }
 
+  updateBoard(tile, square) {
+    console.log("Updating board");
+    this.players.forEach(player => player.socket.emit('update', { tile, square }));
+  }
+
   updatePlayers() {
     console.log("Updating players");
     this.players.forEach(player => player.socket.emit('players', { players: this.getPlayers() }));
