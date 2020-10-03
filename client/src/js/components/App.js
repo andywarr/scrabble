@@ -370,6 +370,11 @@ class App extends Component {
 
     this.socket.on('update', (data) => {
       console.log('update', data);
+      let board = {this.state.board};
+       board[data.square] = data.tile;
+       this.setState({
+         board: board
+       });
     });
 
     this.socket.on('issue', (data) => {
