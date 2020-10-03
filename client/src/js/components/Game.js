@@ -10,14 +10,9 @@ import '../../css/game.scss';
 export default function Game(props) {
 
   const game = useRef(null);
-
-  let boundary1;
-  let boundary2;
+  const boundary = {}
 
   let tile;
-  let tile_size;
-  let origin;
-  let offset;
 
   function getSVGPosition(x, y) {
     let CTM = game.current.getScreenCTM();
@@ -82,22 +77,22 @@ export default function Game(props) {
     let y;
 
     // Calculate X coordinate
-    if (pos.x <= tile.offset.x + boundary1.x) {
-      x = boundary1.x;
+    if (pos.x <= tile.offset.x + boundary.x) {
+      x = boundary.left;
     }
-    else if (pos.x + tile.size >= boundary2.x) {
-      x = boundary2.x - tile.size - tile.offset.x;
+    else if (pos.x + tile.size >= boundary.x) {
+      x = boundary.right - tile.size - tile.offset.x;
     }
     else {
       x = pos.x - tile.offset.x;
     }
 
     // Calculate Y coordinate
-    if (pos.y <= tile.offset.y + boundary1.y) {
-      y = boundary1.y;
+    if (pos.y <= tile.offset.y + boundary.y) {
+      y = boundary.top;
     }
-    else if (pos.y + tile.size >= boundary2.y) {
-      y = boundary2.y - tile.size - tile.offset.y;
+    else if (pos.y + tile.size >= boundary.y) {
+      y = boundary.bottom - tile.size - tile.offset.y;
     }
     else {
       y = pos.y - tile.offset.y;
@@ -151,10 +146,13 @@ export default function Game(props) {
 
   useEffect(() => {
     if (props.status === 2) {
-      console.log("EFFECT", props);
+      let topLeft = getSVGPosition(game.current.getClientRects()[0].left, game.current.getClientRects()[0].top);
+      let bottomRight = getSVGPosition(game.current.getClientRects()[0].right, game.current.getClientRects()[0].bottom);
 
-      boundary1 = getSVGPosition(game.current.getClientRects()[0].left, game.current.getClientRects()[0].top);
-      boundary2 = getSVGPosition(game.current.getClientRects()[0].right, game.current.getClientRects()[0].bottom);
+      boundary.left = topLeft.x;
+      boundary.top = topLeft.y;
+      boundary.bottom = bottomRight.y;
+      boundary.right = bottomRight.x;
 
       props.playerTray.forEach((slot) => {
         let _slot = game.current.getElementById(slot.id)
