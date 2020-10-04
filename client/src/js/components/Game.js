@@ -33,7 +33,7 @@ export default function Game(props) {
   }
 
   function hasTransforms(el) {
-    return el.transform.baseVal.length > 0 ||
+    return el.transform.baseVal.length > 0 &&
       el.transform.baseVal.getItem(0).type === SVGTransform.SVG_TRANSFORM_TRANSLATE;
   }
 
@@ -57,7 +57,7 @@ export default function Game(props) {
       let dimens = tile.getClientRects()[0];
       let pos = getSVGPosition(e.clientX, e.clientY);
 
-      tile.size = getSize(tile);;
+      tile.size = getSize(tile);
       tile.origin = getSVGPosition(dimens.left, dimens.top);
       tile.offset = {x: pos.x - tile.origin.x, y: pos.y - tile.origin.y}
 
@@ -116,13 +116,7 @@ export default function Game(props) {
         square.size = getSize(square);
 
         if (pos.x >= square.pos.x && pos.x <= square.pos.x + square.size && pos.y >= square.pos.y && pos.y <= square.pos.y + square.size) {
-          x = square.pos.x + ((square.size - tile.size)/2);
-          y = square.pos.y + ((square.size - tile.size)/2);
-
-          square.classList.add("occupied");
-
-          let attrValue = "translate(" + [x, y] + ")";
-          tile.setAttribute('transform', attrValue);
+          placeIn(tile, square);
 
           placed = true;
 
@@ -142,6 +136,59 @@ export default function Game(props) {
     document.removeEventListener('mouseup', handleMouseUp);
   }
 
+  function placeIn(el, into) {
+    into.dimens = into.getClientRects()[0];
+    into.pos = getSVGPosition(into.dimens.x, into.dimens.y);
+    into.size = getSize(into);
+    el.size = getSize(el);
+
+    let x = into.pos.x + ((into.size - el.size)/2);
+    let y = into.pos.y + ((into.size - el.size)/2);
+
+    if (!hasTransforms(el)) {
+      addTransforms(el);
+    }
+
+    let attrValue = "translate(" + [x, y] + ")";
+    el.setAttribute('transform', attrValue);
+
+    el.classList.remove("closed");
+    into.classList.add("occupied");
+  }
+
+  function renderBoard() {
+    for (const property in props.board) {
+      let square = game.current.getElementById(property)
+      let tile = game.current.getElementById(props.board[property]);
+
+      if (!tile) {
+        square.classList.remove("occupied");
+      }
+      else {
+        placeIn(tile, square);
+      }
+    }
+  }
+
+  function renderTray() {
+    props.playerTray.forEach((slot) => {
+      let space = game.current.getElementById(slot.id)
+      let tile = game.current.getElementById(slot.tile_id);
+
+      if (!tile) {
+        space.classList.remove("occupied");
+      }
+      else if (!isOccupied(space)) {
+        placeIn(tile, space);
+
+        if(tile.hasEventListener === undefined) {
+          tile.addEventListener("mousedown", handleMouseDown);
+          tile.hasEventListener = true;
+        }
+      }
+    });
+  }
+
   useEffect(() => {
     if (props.status === 2) {
       let topLeft = getSVGPosition(game.current.getClientRects()[0].left, game.current.getClientRects()[0].top);
@@ -152,29 +199,8 @@ export default function Game(props) {
       boundary.bottom = bottomRight.y;
       boundary.right = bottomRight.x;
 
-      props.playerTray.forEach((slot) => {
-        let _slot = game.current.getElementById(slot.id)
-        let tile = game.current.getElementById(slot.tile_id);
-
-        if (tile !== null) {
-          let x = _slot.x.baseVal.value + ((_slot.width.baseVal.value - tile.childNodes[0].width.baseVal.value)/2);
-          let y = _slot.y.baseVal.value + ((_slot.width.baseVal.value - tile.childNodes[0].width.baseVal.value)/2);
-
-          if (!hasTransforms(tile)) {
-            addTransforms(tile);
-          }
-
-          let attrValue = "translate(" + [x, y] + ")";
-          tile.setAttribute('transform', attrValue);
-
-          tile.classList.remove("closed");
-
-          if(tile.hasEventListener === undefined) {
-            tile.addEventListener("mousedown", handleMouseDown);
-            tile.hasEventListener = true;
-          }
-        }
-      });
+      renderBoard();
+      renderTray();
     }
   });
 
@@ -922,13 +948,13 @@ export default function Game(props) {
       </g>
       </g>
       <g id="Tray">
-      <rect id="slot_1" x="376.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/>
-      <rect id="slot_2" x="484.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/>
-      <rect id="slot_3" x="592.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/>
-      <rect id="slot_4" x="700.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/>
-      <rect id="slot_5" x="808.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/>
-      <rect id="slot_6" x="916.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/>
-      <rect id="slot_7" x="1024.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/>
+      <g id="slot_1"><rect x="376.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
+      <g id="slot_2"><rect x="484.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
+      <g id="slot_3"><rect x="592.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
+      <g id="slot_4"><rect x="700.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
+      <g id="slot_5"><rect x="808.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
+      <g id="slot_6"><rect x="916.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
+      <g id="slot_7"><rect x="1024.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
       </g>
       <g id="Tiles">
       <g id="a_9" className="closed draggable tile">
