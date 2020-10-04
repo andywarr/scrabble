@@ -260,6 +260,7 @@ class App extends Component {
 
     this.done = this.done.bind(this);
     this.setName = this.setName.bind(this);
+    this.removeTileFromTray = this.removeTileFromTray.bind(this);
     this.setStatus = this.setStatus.bind(this);
     this.updateBoard = this.updateBoard.bind(this);
 
@@ -278,7 +279,16 @@ class App extends Component {
     for (let slot of this.state.playerTray) {
       if (slot.tile_id === null) {
         slot.tile_id = tile.id;
-        return;
+        break;
+      }
+    }
+  }
+
+  removeTileFromTray(tile) {
+    for (let slot of this.state.playerTray) {
+      if (slot.tile_id === tile.id) {
+        slot.tile_id = null;
+        break;
       }
     }
   }
@@ -370,7 +380,7 @@ class App extends Component {
 
     this.socket.on('update', (data) => {
       console.log('update', data);
-      let board = {this.state.board};
+      let board = {...this.state.board};
        board[data.square] = data.tile;
        this.setState({
          board: board
@@ -386,7 +396,7 @@ class App extends Component {
     return (
       <div>
         <Share status={this.state.status} />
-        <Game done={this.done} playerId={this.state.playerId} playerTray={this.state.playerTray} players={this.state.players} setName={this.setName} setStatus={this.setStatus} status={this.state.status} turn={this.state.turn} updateBoard={this.updateBoard} />
+        <Game board={this.state.board} done={this.done} playerId={this.state.playerId} playerTray={this.state.playerTray} players={this.state.players} removeTileFromTray={this.removeTileFromTray} setName={this.setName} setStatus={this.setStatus} status={this.state.status} turn={this.state.turn} updateBoard={this.updateBoard} />
       </div>
     );
   }

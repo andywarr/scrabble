@@ -128,9 +128,10 @@ export default function Game(props) {
           let attrValue = "translate(" + [x, y] + ")";
           tile.setAttribute('transform', attrValue);
 
-          props.updateBoard(tile.id, square.id);
-
           placed = true;
+
+          props.removeTileFromTray(tile);
+          props.updateBoard(tile.id, square.id);
         }
       }
     });
@@ -142,6 +143,7 @@ export default function Game(props) {
     }
 
     document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
   }
 
   useEffect(() => {
@@ -176,7 +178,10 @@ export default function Game(props) {
 
           tile.classList.remove("closed");
 
-          tile.addEventListener("mousedown", handleMouseDown);
+          if(tile.hasEventListener === undefined) {
+            tile.addEventListener("mousedown", handleMouseDown);
+            tile.hasEventListener = true;
+          }
         }
       });
     }
