@@ -166,6 +166,10 @@ export default function Game(props) {
       }
       else {
         placeIn(tile, square);
+
+        if (props.playerId !== props.turn) {
+          tile.classList.remove("draggable");
+        }
       }
     }
   }
@@ -178,12 +182,18 @@ export default function Game(props) {
       if (!tile) {
         space.classList.remove("occupied");
       }
-      else if (!isOccupied(space)) {
+      else {
         placeIn(tile, space);
 
-        if(tile.hasEventListener === undefined) {
-          tile.addEventListener("mousedown", handleMouseDown);
-          tile.hasEventListener = true;
+        if (props.playerId === props.turn) {
+          if(tile.hasEventListener === undefined) {
+            tile.addEventListener("mousedown", handleMouseDown);
+            tile.hasEventListener = true;
+          }
+          tile.classList.add("draggable");
+        }
+        else {
+          tile.classList.remove("draggable");
         }
       }
     });
