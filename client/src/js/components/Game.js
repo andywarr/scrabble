@@ -54,10 +54,6 @@ export default function Game(props) {
       // select the g element
       tile = e.target.parentNode;
 
-      if (!hasTransforms(tile)) {
-        addTransforms(tile);
-      }
-
       let dimens = tile.getClientRects()[0];
       let pos = getSVGPosition(e.clientX, e.clientY);
 
@@ -164,13 +160,8 @@ export default function Game(props) {
           let x = _slot.x.baseVal.value + ((_slot.width.baseVal.value - tile.childNodes[0].width.baseVal.value)/2);
           let y = _slot.y.baseVal.value + ((_slot.width.baseVal.value - tile.childNodes[0].width.baseVal.value)/2);
 
-          let transforms = tile.transform.baseVal;
-
-          if (transforms.length === 0 ||
-            transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
-            let translate = game.current.createSVGTransform();
-            translate.setTranslate(0, 0);
-            tile.transform.baseVal.insertItemBefore(translate, 0);
+          if (!hasTransforms(tile)) {
+            addTransforms(tile);
           }
 
           let attrValue = "translate(" + [x, y] + ")";
