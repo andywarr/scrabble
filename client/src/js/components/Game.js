@@ -59,7 +59,9 @@ export default function Game(props) {
 
       tile.size = getSize(tile);
       tile.origin = getSVGPosition(dimens.left, dimens.top);
-      tile.offset = {x: pos.x - tile.origin.x, y: pos.y - tile.origin.y}
+      tile.offset = {x: pos.x - tile.origin.x, y: pos.y - tile.origin.y};
+
+
     }
   }
 
@@ -115,7 +117,7 @@ export default function Game(props) {
           square.pos = getSVGPosition(square.dimens.x, square.dimens.y);
           square.size = getSize(square);
 
-          if (pos.x >= square.pos.x && pos.x <= square.pos.x + square.size && pos.y >= square.pos.y && pos.y <= square.pos.y + square.size) {
+          if (isIn(pos, square)) {
             placeIn(tile, square);
 
             placed = true;
@@ -134,6 +136,10 @@ export default function Game(props) {
 
       tile = null;
     }
+  }
+
+  function isIn(pos, el) {
+    return pos.x >= el.pos.x && pos.x <= el.pos.x + el.size && pos.y >= el.pos.y && pos.y <= el.pos.y + el.size;
   }
 
   function placeIn(el, into) {
