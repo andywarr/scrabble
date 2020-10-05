@@ -49,8 +49,12 @@ export default function Game(props) {
     return el.parentNode.classList.contains('tile');
   }
 
+  function wasInTray(el) {
+    return el.wasIn.classList.contains('tray');
+  }
+
   function handleMouseDown(e) {
-    if (isDraggable(e.target) && isTile(e.target)) {
+    if (isTile(e.target) && isDraggable(e.target)) {
       // select the g element
       tile = e.target.parentNode;
 
@@ -60,8 +64,6 @@ export default function Game(props) {
       tile.size = getSize(tile);
       tile.origin = getSVGPosition(dimens.left, dimens.top);
       tile.offset = {x: pos.x - tile.origin.x, y: pos.y - tile.origin.y};
-
-
     }
   }
 
@@ -121,14 +123,20 @@ export default function Game(props) {
             placeIn(tile, square);
 
             placed = true;
-
-            props.removeTileFromTray(tile);
-            props.updateBoard(tile.id, square.id);
           }
         }
       });
 
-      if (!placed) {
+      if (placed) {
+        tile.wasIn.classList.remove("occupied");
+        if (wasInTray(tile)) {
+          props.removeTileFromTray(tile);
+        }
+        props.updateBoard(null, tile.wasIn.id);
+        props.updateBoard(tile.id, tile.isIn.id);
+
+      }
+      else {
         // Set X, Y coordinate
         let attrValue = "translate(" + [tile.origin.x, tile.origin.y] + ")";
         tile.setAttribute('transform', attrValue);
@@ -157,6 +165,9 @@ export default function Game(props) {
 
     let attrValue = "translate(" + [x, y] + ")";
     el.setAttribute('transform', attrValue);
+
+    el.wasIn = el.isIn;
+    el.isIn = into;
 
     el.classList.remove("closed");
     into.classList.add("occupied");
@@ -960,13 +971,13 @@ export default function Game(props) {
       </g>
       </g>
       <g id="Tray">
-      <g id="slot_1"><rect x="376.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
-      <g id="slot_2"><rect x="484.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
-      <g id="slot_3"><rect x="592.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
-      <g id="slot_4"><rect x="700.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
-      <g id="slot_5"><rect x="808.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
-      <g id="slot_6"><rect x="916.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
-      <g id="slot_7"><rect x="1024.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
+      <g id="slot_1" className="tray"><rect x="376.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
+      <g id="slot_2" className="tray"><rect x="484.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
+      <g id="slot_3" className="tray"><rect x="592.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
+      <g id="slot_4" className="tray"><rect x="700.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
+      <g id="slot_5" className="tray"><rect x="808.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
+      <g id="slot_6" className="tray"><rect x="916.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
+      <g id="slot_7" className="tray"><rect x="1024.5" y="1600.5" width="99" height="99" rx="3.5" stroke="#FEFEFE" strokeDasharray="5 5"/></g>
       </g>
       <g id="Tiles">
       <g id="a_9" className="closed draggable tile">
