@@ -305,6 +305,7 @@ class App extends Component {
     return tileInTray;
   }
 
+  // TODO: Need to update player tiles, tiles played, etc...
   done() {
     console.log('Player turn complete');
     this.socket.emit('done');

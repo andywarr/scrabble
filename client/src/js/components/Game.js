@@ -10,9 +10,9 @@ import '../../css/game.scss';
 export default function Game(props) {
 
   const game = useRef(null);
-  const boundary = {}
+  const boundary = {};
 
-  let tile;
+  let tile = null;
 
   function getSVGPosition(x, y) {
     let CTM = game.current.getScreenCTM();
@@ -60,80 +60,80 @@ export default function Game(props) {
       tile.size = getSize(tile);
       tile.origin = getSVGPosition(dimens.left, dimens.top);
       tile.offset = {x: pos.x - tile.origin.x, y: pos.y - tile.origin.y}
-
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
     }
   }
 
   function handleMouseMove(e) {
-    let pos = getSVGPosition(e.clientX, e.clientY);
+    if (tile) {
+      let pos = getSVGPosition(e.clientX, e.clientY);
 
-    let x;
-    let y;
+      let x;
+      let y;
 
-    // Calculate X coordinate
-    if (pos.x <= tile.offset.x + boundary.x) {
-      x = boundary.left;
-    }
-    else if (pos.x + tile.size >= boundary.x) {
-      x = boundary.right - tile.size - tile.offset.x;
-    }
-    else {
-      x = pos.x - tile.offset.x;
-    }
+      // Calculate X coordinate
+      if (pos.x <= tile.offset.x + boundary.x) {
+        x = boundary.left;
+      }
+      else if (pos.x + tile.size >= boundary.x) {
+        x = boundary.right - tile.size - tile.offset.x;
+      }
+      else {
+        x = pos.x - tile.offset.x;
+      }
 
-    // Calculate Y coordinate
-    if (pos.y <= tile.offset.y + boundary.y) {
-      y = boundary.top;
-    }
-    else if (pos.y + tile.size >= boundary.y) {
-      y = boundary.bottom - tile.size - tile.offset.y;
-    }
-    else {
-      y = pos.y - tile.offset.y;
-    }
+      // Calculate Y coordinate
+      if (pos.y <= tile.offset.y + boundary.y) {
+        y = boundary.top;
+      }
+      else if (pos.y + tile.size >= boundary.y) {
+        y = boundary.bottom - tile.size - tile.offset.y;
+      }
+      else {
+        y = pos.y - tile.offset.y;
+      }
 
-    // Set X, Y coordinate
-    let attrValue = "translate(" + [x, y] + ")";
-    tile.setAttribute('transform', attrValue);
+      // Set X, Y coordinate
+      let attrValue = "translate(" + [x, y] + ")";
+      tile.setAttribute('transform', attrValue);
+    }
   }
 
   function handleMouseUp(e) {
-    let pos = getSVGPosition(e.clientX, e.clientY);
+    if (tile) {
+      let pos = getSVGPosition(e.clientX, e.clientY);
 
-    let x;
-    let y;
+      let x;
+      let y;
 
-    let placed = false;
+      let placed = false;
 
-    let squares = game.current.getElementById('Board').childNodes;
+      let squares = game.current.getElementById('Board').childNodes;
 
-    squares.forEach((square) => {
-      if(!isOccupied(square)) {
-        square.dimens = square.getClientRects()[0];
-        square.pos = getSVGPosition(square.dimens.x, square.dimens.y);
-        square.size = getSize(square);
+      squares.forEach((square) => {
+        if(!isOccupied(square)) {
+          square.dimens = square.getClientRects()[0];
+          square.pos = getSVGPosition(square.dimens.x, square.dimens.y);
+          square.size = getSize(square);
 
-        if (pos.x >= square.pos.x && pos.x <= square.pos.x + square.size && pos.y >= square.pos.y && pos.y <= square.pos.y + square.size) {
-          placeIn(tile, square);
+          if (pos.x >= square.pos.x && pos.x <= square.pos.x + square.size && pos.y >= square.pos.y && pos.y <= square.pos.y + square.size) {
+            placeIn(tile, square);
 
-          placed = true;
+            placed = true;
 
-          props.removeTileFromTray(tile);
-          props.updateBoard(tile.id, square.id);
+            props.removeTileFromTray(tile);
+            props.updateBoard(tile.id, square.id);
+          }
         }
+      });
+
+      if (!placed) {
+        // Set X, Y coordinate
+        let attrValue = "translate(" + [tile.origin.x, tile.origin.y] + ")";
+        tile.setAttribute('transform', attrValue);
       }
-    });
 
-    if (!placed) {
-      // Set X, Y coordinate
-      let attrValue = "translate(" + [tile.origin.x, tile.origin.y] + ")";
-      tile.setAttribute('transform', attrValue);
+      tile = null;
     }
-
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
   }
 
   function placeIn(el, into) {
@@ -156,7 +156,7 @@ export default function Game(props) {
     into.classList.add("occupied");
   }
 
-  function renderBoard() {
+  function renderBoardTiles() {
     for (const property in props.board) {
       let square = game.current.getElementById(property)
       let tile = game.current.getElementById(props.board[property]);
@@ -174,7 +174,7 @@ export default function Game(props) {
     }
   }
 
-  function renderTray() {
+  function renderTrayTiles() {
     props.playerTray.forEach((slot) => {
       let space = game.current.getElementById(slot.id)
       let tile = game.current.getElementById(slot.tile_id);
@@ -186,10 +186,6 @@ export default function Game(props) {
         placeIn(tile, space);
 
         if (props.playerId === props.turn) {
-          if(tile.hasEventListener === undefined) {
-            tile.addEventListener("mousedown", handleMouseDown);
-            tile.hasEventListener = true;
-          }
           tile.classList.add("draggable");
         }
         else {
@@ -209,15 +205,15 @@ export default function Game(props) {
       boundary.bottom = bottomRight.y;
       boundary.right = bottomRight.x;
 
-      renderBoard();
-      renderTray();
+      renderBoardTiles();
+      renderTrayTiles();
     }
   });
 
   return (
     <div id="game-container">
       <div id="board-container" className="column">
-      <svg width="750" height="750" viewBox="0 0 1500 1700" fill="none" ref={game}>
+      <svg width="750" height="750" viewBox="0 0 1500 1700" fill="none" ref={game} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
       <g id="Game">
       <g id="Board">
       <g id="0_0">
