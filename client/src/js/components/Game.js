@@ -49,6 +49,10 @@ export default function Game(props) {
     return el.parentNode.classList.contains('tile');
   }
 
+  function isInTray(el) {
+    return el.isIn.classList.contains('tray');
+  }
+
   function wasInTray(el) {
     return el.wasIn.classList.contains('tray');
   }
@@ -106,11 +110,9 @@ export default function Game(props) {
     if (tile) {
       let pos = getSVGPosition(e.clientX, e.clientY);
 
-      let x;
-      let y;
-
       let placed = false;
 
+      // Check if tile is placed on the board
       let squares = game.current.getElementById('Board').childNodes;
 
       squares.forEach((square) => {
@@ -122,28 +124,51 @@ export default function Game(props) {
           if (isIn(pos, square)) {
             placeIn(tile, square);
 
-            placed = true;
+            updateBoard(tile);
+
+            return;
           }
         }
       });
 
-      if (placed) {
-        tile.wasIn.classList.remove("occupied");
-        if (wasInTray(tile)) {
-          props.removeTileFromTray(tile);
+      // Check if tile is placed in the board
+      let slots = game.current.getElementById('Tray').childNodes;
+
+      slots.forEach((slot) => {
+        if(!isOccupied(slot)) {
+          slot.dimens = slot.getClientRects()[0];
+          slot.pos = getSVGPosition(slot.dimens.x, slot.dimens.y);
+          slot.size = getSize(slot);
+
+          if (isIn(pos, slot)) {
+            placeIn(tile, slot);
+
+            updateBoard(tile);
+
+            return;
+          }
         }
-        props.updateBoard(null, tile.wasIn.id);
-        props.updateBoard(tile.id, tile.isIn.id);
+      });
 
-      }
-      else {
-        // Set X, Y coordinate
-        let attrValue = "translate(" + [tile.origin.x, tile.origin.y] + ")";
-        tile.setAttribute('transform', attrValue);
-      }
-
-      tile = null;
+      let attrValue = "translate(" + [tile.origin.x, tile.origin.y] + ")";
+      tile.setAttribute('transform', attrValue);
+      updateBoard(tile);
     }
+  }
+
+  function updateBoard(tile) {
+    tile.wasIn.classList.remove("occupied");
+    if (wasInTray(tile)) {
+      props.removeTileFromTray(tile);
+    }
+    if (isInTray(tile)) {
+      props.updateTray(tile, tile.isIn);
+    }
+    // TODO: Need to update board once to avoid flicker
+    props.updateBoard(null, tile.wasIn.id);
+    props.updateBoard(tile.id, tile.isIn.id);
+
+    tile = null;
   }
 
   function isIn(pos, el) {
