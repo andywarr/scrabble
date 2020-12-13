@@ -112,7 +112,7 @@ class Game {
       this.#playerTurnIndex = 0;
     }
     else if (this.playerTurnIndex + 1 < this.getNumberOfPlayers()) {
-      this.playerTurnIndex = this.playerTurnIndex + 1
+      this.#playerTurnIndex = this.playerTurnIndex + 1
     }
     else {
       this.#playerTurnIndex = 0;
