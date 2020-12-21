@@ -124,14 +124,15 @@ export default function Game(props) {
           if (isIn(pos, square)) {
             placeIn(tile, square);
 
+            console.log("Tile placed on board");
             updateBoard(tile);
 
-            return;
+            placed = true;
           }
         }
       });
 
-      // Check if tile is placed in the board
+      // Check if tile is placed in the tray
       let slots = game.current.getElementById('Tray').childNodes;
 
       slots.forEach((slot) => {
@@ -143,16 +144,20 @@ export default function Game(props) {
           if (isIn(pos, slot)) {
             placeIn(tile, slot);
 
+            console.log("Tile placed in tray");
             updateBoard(tile);
 
-            return;
+            placed = true;
           }
         }
       });
 
-      let attrValue = "translate(" + [tile.origin.x, tile.origin.y] + ")";
-      tile.setAttribute('transform', attrValue);
-      updateBoard(tile);
+      if (placed === false) {
+        console.log("Tile returned to original position");
+        let attrValue = "translate(" + [tile.origin.x, tile.origin.y] + ")";
+        tile.setAttribute('transform', attrValue);
+        updateBoard(tile);
+      }
     }
   }
 
