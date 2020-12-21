@@ -169,7 +169,7 @@ export default function Game(props) {
     if (isInTray(tile)) {
       props.updateTray(tile, tile.isIn);
     }
-    // TODO: Need to update board once to avoid flicker
+
     props.updateBoard(null, tile.wasIn.id);
     props.updateBoard(tile.id, tile.isIn.id);
 
