@@ -10,7 +10,21 @@ class Player {
     this.#name = "";
     this.#score = 0;
     this.#socket = socket;
-    this.#tiles = [];
+    this.#tiles = new Set();
+  }
+
+  addTile(tile) {
+    console.log("Add tile", tile);
+    this.#tiles.add(tile)
+  }
+
+  removeTile(tile_id) {
+    console.log("Remove tile", tile_id);
+    this.#tiles.forEach((tile) => {
+      if (tile.id === tile_id) {
+        this.#tiles.delete(tile);
+      }
+    });
   }
 
   get id() {
@@ -42,7 +56,7 @@ class Player {
   }
 
   get tiles() {
-    return this.#tiles;
+    return [...this.#tiles];
   }
 
   set id(id) {
@@ -62,7 +76,7 @@ class Player {
   }
 
   set tiles(tiles) {
-    this.#tiles = tiles;
+    this.#tiles = new Set(tiles);
   }
 
   updatePlayerTiles() {

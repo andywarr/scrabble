@@ -31,6 +31,18 @@ io.on('connection', (socket) => {
   var player = new Player(socket);
   var game = null;
 
+  socket.on('addTile', (data) => {
+    var tile_id = data.tile_id;
+    var tile = game.getTile(tile_id);
+    console.log(tile);
+    player.addTile(tile);
+  });
+
+  socket.on('removeTile', (data) => {
+    var tile_id = data.tile_id;
+    player.removeTile(tile_id);
+  });
+
   socket.on('done', () => {
     console.log('Player turn complete');
     game.updatePlayerTurn();

@@ -28,8 +28,25 @@ class Game {
   }
 
   drawTiles() {
+    this.players.forEach(player => this.getTiles(player));
+  }
+
+  getTile(tile_id) {
+    let _tile;
+
+    tiles.forEach((tile) => {
+      if(tile.id === tile_id) {
+        _tile = tile;
+      }
+    });
+
+    return _tile;
+  }
+
+  getTiles(player) {
     const gameTiles = [...this.tiles];
-    const playerTiles = [...this.players[this.playerTurnIndex].tiles];
+    const playerTiles = [...player.tiles];
+    console.log("PLAYER TILES", playerTiles);
     const tilesNeeded = 7 - playerTiles.length;
     let selectedTiles = [];
     let numberOfTilesToDraw = tilesNeeded;
@@ -44,9 +61,9 @@ class Game {
     }
 
     this.tiles = gameTiles;
-    this.players[this.playerTurnIndex].tiles = [...playerTiles, ...selectedTiles];
+    player.tiles = [...playerTiles, ...selectedTiles];
 
-    this.players[this.playerTurnIndex].updatePlayerTiles();
+    player.updatePlayerTiles();
   }
 
   get id() {
@@ -124,7 +141,9 @@ class Game {
   }
 
   updateBoard(tile, square) {
-    console.log("Updating board");
+    console.log("Updating board", tile, square);
+    // REMOVE THE TILE FROM THE TRAY
+    // STORE THE POSITION OF THE TILE ON THE BOARD
     this.players.forEach(player => player.socket.emit('update', { tile, square }));
   }
 
