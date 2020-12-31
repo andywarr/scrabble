@@ -1,6 +1,8 @@
+const board = require('./board.js').board;
 const tiles = require('./tiles.js').tiles;
 
 class Game {
+  #board;
   #id;
   #playerTurnIndex;
   #players;
@@ -8,6 +10,7 @@ class Game {
   #tiles;
 
   constructor(id) {
+    this.#board = board;
     this.#id = id;
     this.#playerTurnIndex;
     this.#players = [];
@@ -66,6 +69,10 @@ class Game {
     player.updatePlayerTiles();
   }
 
+  get board() {
+    return this.#board;
+  }
+
   get id() {
     return this.#id;
   }
@@ -112,6 +119,10 @@ class Game {
     this.#playerTurnIndex = playerTurnIndex;
   }
 
+  set board(board) {
+    this.#board = board;
+  }
+
   set players(players) {
     this.#players = players;
   }
@@ -142,8 +153,9 @@ class Game {
 
   updateBoard(tile, square) {
     console.log("Updating board", tile, square);
-    // REMOVE THE TILE FROM THE TRAY
-    // STORE THE POSITION OF THE TILE ON THE BOARD
+    let board = {...this.board};
+    board[square] = tile;
+    this.board = board;
     this.players.forEach(player => player.socket.emit('update', { tile, square }));
   }
 
