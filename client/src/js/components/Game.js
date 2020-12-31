@@ -223,7 +223,7 @@ export default function Game(props) {
         square.classList.remove("occupied");
         if(square.hasOwnProperty('tile')) {
           square.tile.classList.add("closed");
-          square.tile = null;
+          delete square.tile;
         }
       }
       else {
