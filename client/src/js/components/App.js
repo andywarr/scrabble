@@ -242,6 +242,7 @@ class App extends Component {
         "14_13": null,
         "14_14": null,
       },
+      errorMsg: "",
       gameId: "",
       playerId: "",
       playerTiles: [],
@@ -387,6 +388,7 @@ class App extends Component {
     this.socket.on('turn', (data) => {
       console.log('turn', data.turn);
       this.setState({
+        errorMsg: "",
         turn: data.turn
       });
     });
@@ -402,6 +404,13 @@ class App extends Component {
 
     this.socket.on('issue', (data) => {
       console.log('error', data);
+      if (data.hasOwnProperty('code')) {
+        if (data.code === 1) {
+          this.setState({
+            errorMsg: data.msg,
+          });
+        }
+      }
     });
   }
 
@@ -409,7 +418,7 @@ class App extends Component {
     return (
       <div>
         <Share status={this.state.status} />
-        <Game board={this.state.board} done={this.done} playerId={this.state.playerId} playerTray={this.state.playerTray} players={this.state.players} removeTileFromTray={this.removeTileFromTray} setName={this.setName} setStatus={this.setStatus} status={this.state.status} turn={this.state.turn} updateBoard={this.updateBoard} addTileToTray={this.addTileToTray} />
+        <Game board={this.state.board} done={this.done} errorMsg={this.state.errorMsg} playerId={this.state.playerId} playerTray={this.state.playerTray} players={this.state.players} removeTileFromTray={this.removeTileFromTray} setName={this.setName} setStatus={this.setStatus} status={this.state.status} turn={this.state.turn} updateBoard={this.updateBoard} addTileToTray={this.addTileToTray} />
       </div>
     );
   }

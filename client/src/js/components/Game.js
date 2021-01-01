@@ -1528,7 +1528,7 @@ export default function Game(props) {
       <div id="player-container" className="column">
         <Players playerId={props.playerId} players={props.players} setName={props.setName} turn={props.turn} />
         <Set setStatus={props.setStatus} status={props.status} />
-        <Turn done={props.done} playerId={props.playerId} status={props.status} turn={props.turn} />
+        <Turn done={props.done} errorMsg={props.errorMsg} playerId={props.playerId} status={props.status} turn={props.turn} />
       </div>
     </div>
   );
