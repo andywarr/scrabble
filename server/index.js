@@ -44,6 +44,12 @@ io.on('connection', (socket) => {
   });
 
   socket.on('done', () => {
+    if (!game.isTileOnCenterSquare()) {
+      console.log('A tile is not on the center square');
+      player.socket.emit('issue', { code: 1, msg: "A tile needs to be placed in the center square." });
+      return;
+    }
+
     console.log('Player turn complete');
     game.updatePlayerTurn();
     game.drawTiles();
@@ -132,7 +138,6 @@ io.on('connection', (socket) => {
         // The remaining player is the winner
       }
     }
-
   });
 });
 

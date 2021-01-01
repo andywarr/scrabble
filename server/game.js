@@ -168,6 +168,10 @@ class Game {
     console.log("Updating status", this.status);
     this.players.forEach(player => player.socket.emit('status', { status: this.status }));
   }
+
+  isTileOnCenterSquare() {
+    return this.board["7_7"] !== null;
+  }
 }
 
 module.exports = Game;
