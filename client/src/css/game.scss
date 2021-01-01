@@ -33,6 +33,10 @@ body {
   cursor: move;
 }
 
+.error {
+  color: #F44336;
+}
+
 #game-container {
   display: flex;
   flex-direction: row;
