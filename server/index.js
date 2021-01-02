@@ -56,7 +56,13 @@ io.on('connection', (socket) => {
       return;
     }
 
+    let score = game.score();
+    // TODO (andywarr): When scoring a game we can check for the check spelling of a word. If not correct we can return a score of null, which will indicate an invalid word
+    player.updatePlayerScore(score);
+    game.updatePlayers();
+
     console.log('Player turn complete');
+    game.resetPlayedTiles();
     game.updatePlayerTurn();
     game.drawTiles();
   });

@@ -1,23 +1,27 @@
 const board = require('./board.js').board;
+const doubleLetters = require('./board.js').doubleLetters;
+const doubleWords = require('./board.js').doubleWords;
+const tripleLetters = require('./board.js').tripleLetters;
+const tripleWords = require('./board.js').tripleWords;
 const tiles = require('./tiles.js').tiles;
 
 class Game {
   #board;
   #id;
+  #playedTiles;
   #playerTurnIndex;
   #players;
   #status;
   #tiles;
-  #turnTiles;
 
   constructor(id) {
     this.#board = board;
     this.#id = id;
+    this.#playedTiles = board;
     this.#playerTurnIndex;
     this.#players = [];
     this.#status = 0;
     this.#tiles = tiles;
-    this.#turnTiles = board;
   }
 
   addPlayer(player) {
@@ -79,6 +83,10 @@ class Game {
     return this.#id;
   }
 
+  get playedTiles() {
+    return this.#playedTiles;
+  }
+
   get playerTurnIndex() {
     return this.#playerTurnIndex;
   }
@@ -93,10 +101,6 @@ class Game {
 
   get tiles() {
     return this.#tiles;
-  }
-
-  get turnTiles() {
-    return this.#turnTiles;
   }
 
   getPlayerTurn() {
@@ -121,12 +125,115 @@ class Game {
     this.players = this.players.filter(player => player.id !== id);
   }
 
+  resetPlayedTiles() {
+    this.#playedTiles = board;
+  }
+
+  score() {
+    let score = 0;
+    let tileScored = {};
+    let wordScore;
+    let wordScored;
+    let wordLength;
+    let wordMultiplier;
+    let r;
+    let c;
+
+    for (const tile in this.playedTiles) {
+      if (this.playedTiles[tile] !== null) {
+        // Traverse left
+        r = parseInt(tile.split('_')[0]);
+        c = parseInt(tile.split('_')[1]);
+        wordScore = 0;
+        wordScored = true;
+        wordLength = 0;
+        wordMultiplier = 1;
+
+        while(c > 0 && this.board[`${r}_${c-1}`] !== null) {
+          c--;
+        }
+
+        while(c <= 14 && this.board[`${r}_${c}`] !== null) {
+          wordScored = wordScored && tileScored.hasOwnProperty(`${r}_${c}`);
+          tileScored[`${r}_${c}`] = true;
+          let tileScore = this.getTile(this.board[`${r}_${c}`]).score;
+          if (this.playedTiles[`${r}_${c}`] !== null) {
+            if (doubleLetters.has(`${r}_${c}`)) {
+              tileScore *= 2;
+            } else if (tripleLetters.has(`${r}_${c}`)) {
+              tileScore *= 3;
+            } else if (doubleWords.has(`${r}_${c}`)) {
+              wordMultiplier *= 2;
+            } else if (tripleWords.has(`${r}_${c}`)) {
+              wordMultiplier *= 3;
+            }
+          }
+
+          wordScore += tileScore;
+          wordLength++;
+          c++;
+        }
+
+        wordScore *= wordMultiplier;
+
+        if (!wordScored && wordLength > 1) {
+          score += wordScore;
+        }
+
+        // Traverse up
+        r = parseInt(tile.split('_')[0]);
+        c = parseInt(tile.split('_')[1]);
+        wordScore = 0;
+        wordScored = true;
+        wordLength = 0;
+        wordMultiplier = 1;
+
+        while(r > 0 && this.board[`${r-1}_${c}`] !== null) {
+          r--;
+        }
+
+        while(r <= 14 && this.board[`${r}_${c}`] !== null) {
+          wordScored = wordScored && tileScored.hasOwnProperty(`${r}_${c}`);
+          tileScored[`${r}_${c}`] = true;
+          let tileScore = this.getTile(this.board[`${r}_${c}`]).score;
+          if (this.playedTiles[`${r}_${c}`] !== null) {
+            if (doubleLetters.has(`${r}_${c}`)) {
+              tileScore *= 2;
+            } else if (tripleLetters.has(`${r}_${c}`)) {
+              tileScore *= 3;
+            } else if (doubleWords.has(`${r}_${c}`)) {
+              wordMultiplier *= 2;
+            } else if (tripleWords.has(`${r}_${c}`)) {
+              wordMultiplier *= 3;
+            }
+          }
+
+          wordScore += tileScore;
+          wordLength++;
+          r++;
+        }
+
+        wordScore *= wordMultiplier;
+
+        if (!wordScored && wordLength > 1) {
+          score += wordScore;
+        }
+      }
+    }
+
+    return score;
+  }
+
   set playerTurnIndex(playerTurnIndex) {
     this.#playerTurnIndex = playerTurnIndex;
   }
 
   set board(board) {
     this.#board = board;
+  }
+
+  set playedTiles(tiles) {
+    this.#playedTiles = tiles;
   }
 
   set players(players) {
@@ -139,10 +246,6 @@ class Game {
 
   set tiles(tiles) {
     this.#tiles = tiles;
-  }
-
-  set turnTiles(tiles) {
-    this.#turnTiles = tiles;
   }
 
   updatePlayerTurn() {
@@ -166,12 +269,22 @@ class Game {
     let board = {...this.board};
     board[square] = tile;
     this.board = board;
+
+    let playedTiles = {...this.playedTiles};
+    playedTiles[square] = tile;
+    this.playedTiles = playedTiles;
+
     this.players.forEach(player => player.socket.emit('update', { tile, square }));
   }
 
   updatePlayers() {
     console.log("Updating players");
     this.players.forEach(player => player.socket.emit('players', { players: this.getPlayers() }));
+  }
+
+  updateScore(playerId, score) {
+    console.log("Updating score", playerId, score);
+    this.players.forEach(player => player.socket.emit('score', { playerId, score }));
   }
 
   updateStatus() {
@@ -184,34 +297,33 @@ class Game {
 
     for (const tile in this.board) {
       if (this.board[tile] !== null) {
-        let x = tile.split('_')[0];
-        let y = tile.split('_')[1];
-        connected = connected && this.findCenter(parseInt(x), parseInt(y), {});
+        let r = parseInt(tile.split('_')[0]);
+        let c = parseInt(tile.split('_')[1]);
+        connected = connected && this.findCenter(r, c, {});
       }
     }
 
     return connected;
   }
 
-  findCenter(x, y, wasHere) {
-    console.log(x,y);
-    if (x === 7 && y === 7) return true;
+  findCenter(r, c, wasHere) {
+    if (r === 7 && c === 7) return true;
 
-    if (this.board[`${x}_${y}`] === null || wasHere.hasOwnProperty(`${x}_${y}`)) return false;
+    if (this.board[`${r}_${c}`] === null || wasHere.hasOwnProperty(`${r}_${c}`)) return false;
 
-    wasHere[`${x}_${y}`] = true;
+    wasHere[`${r}_${c}`] = true;
 
-    if (x !== 0) { // Checks if not on left edge
-      if (this.findCenter(x-1, y, wasHere)) return true;
+    if (c !== 0) { // Checks if not on left edge
+      if (this.findCenter(r, c-1, wasHere)) return true;
     }
-    if (x !== 14) { // Checks if not on right edge
-      if (this.findCenter(x+1, y, wasHere)) return true;
+    if (c !== 14) { // Checks if not on right edge
+      if (this.findCenter(r, c+1, wasHere)) return true;
     }
-    if (y !== 0) { // Checks if not on top edge
-      if (this.findCenter(parseInt(x), y-1, wasHere)) return true;
+    if (r !== 0) { // Checks if not on top edge
+      if (this.findCenter(r-1, c, wasHere)) return true;
     }
-    if (y !== 14) { // Checks if not on bottom edge
-      if (this.findCenter(parseInt(x), y+1, wasHere)) return true;
+    if (r !== 14) { // Checks if not on bottom edge
+      if (this.findCenter(r+1, c, wasHere)) return true;
     }
 
     return false;

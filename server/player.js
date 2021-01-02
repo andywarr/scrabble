@@ -79,6 +79,10 @@ class Player {
     this.#tiles = new Set(tiles);
   }
 
+  updatePlayerScore(score) {
+    this.#score += score;
+  }
+
   updatePlayerTiles() {
     this.socket.emit('tiles', { tiles: this.tiles });
   }

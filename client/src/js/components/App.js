@@ -369,6 +369,10 @@ class App extends Component {
       });
     });
 
+    this.socket.on('score', (data) => {
+      console.log('score', data);
+    });
+
     this.socket.on('status', (data) => {
       console.log('status', data.status);
       this.setState({
