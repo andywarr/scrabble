@@ -50,6 +50,12 @@ io.on('connection', (socket) => {
       return;
     }
 
+    if (!game.isTileConnected()) {
+      console.log('A tile is incorrectly placed');
+      player.socket.emit('issue', { code: 1, msg: "Words need to connect to words that connect to the center square." });
+      return;
+    }
+
     console.log('Player turn complete');
     game.updatePlayerTurn();
     game.drawTiles();

@@ -8,6 +8,7 @@ class Game {
   #players;
   #status;
   #tiles;
+  #turnTiles;
 
   constructor(id) {
     this.#board = board;
@@ -16,6 +17,7 @@ class Game {
     this.#players = [];
     this.#status = 0;
     this.#tiles = tiles;
+    this.#turnTiles = board;
   }
 
   addPlayer(player) {
@@ -93,6 +95,10 @@ class Game {
     return this.#tiles;
   }
 
+  get turnTiles() {
+    return this.#turnTiles;
+  }
+
   getPlayerTurn() {
     return this.players[this.playerTurnIndex];
   }
@@ -135,6 +141,10 @@ class Game {
     this.#tiles = tiles;
   }
 
+  set turnTiles(tiles) {
+    this.#turnTiles = tiles;
+  }
+
   updatePlayerTurn() {
     if (this.playerTurnIndex  === undefined) {
       this.#playerTurnIndex = 0;
@@ -167,6 +177,44 @@ class Game {
   updateStatus() {
     console.log("Updating status", this.status);
     this.players.forEach(player => player.socket.emit('status', { status: this.status }));
+  }
+
+  isTileConnected() {
+    let connected = true;
+
+    for (const tile in this.board) {
+      if (this.board[tile] !== null) {
+        let x = tile.split('_')[0];
+        let y = tile.split('_')[1];
+        connected = connected && this.findCenter(parseInt(x), parseInt(y), {});
+      }
+    }
+
+    return connected;
+  }
+
+  findCenter(x, y, wasHere) {
+    console.log(x,y);
+    if (x === 7 && y === 7) return true;
+
+    if (this.board[`${x}_${y}`] === null || wasHere.hasOwnProperty(`${x}_${y}`)) return false;
+
+    wasHere[`${x}_${y}`] = true;
+
+    if (x !== 0) { // Checks if not on left edge
+      if (this.findCenter(x-1, y, wasHere)) return true;
+    }
+    if (x !== 14) { // Checks if not on right edge
+      if (this.findCenter(x+1, y, wasHere)) return true;
+    }
+    if (y !== 0) { // Checks if not on top edge
+      if (this.findCenter(parseInt(x), y-1, wasHere)) return true;
+    }
+    if (y !== 14) { // Checks if not on bottom edge
+      if (this.findCenter(parseInt(x), y+1, wasHere)) return true;
+    }
+
+    return false;
   }
 
   isTileOnCenterSquare() {
