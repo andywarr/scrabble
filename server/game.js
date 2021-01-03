@@ -221,7 +221,6 @@ class Game {
       }
     }
 
-    console.log("Number of tiles left: ", this.players[this.playerTurnIndex].getNumberOfTiles());
     if (this.players[this.playerTurnIndex].getNumberOfTiles() === 0) {
       score += 50;
     }

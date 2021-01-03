@@ -70,6 +70,8 @@ export default function Game(props) {
       // select the g element
       tile = e.target.parentNode;
 
+      game.current.getElementById('Tiles').appendChild(tile);
+
       let dimens = tile.getClientRects()[0];
       let pos = getSVGPosition(e.clientX, e.clientY);
 
