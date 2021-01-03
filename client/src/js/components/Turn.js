@@ -28,7 +28,7 @@ export default function Turn(props) {
     return (
       <div>
         <p>It's your turn. Once you have completed your turn, press the Done button.</p>
-        <p class="error">{props.errorMsg}</p>
+        <p className="error">{props.errorMsg}</p>
         <input onClick={() => props.done()}
                type="button"
                value="Done" />
