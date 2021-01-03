@@ -132,7 +132,7 @@ export default function Game(props) {
           if (isIn(pos, square)) {
             placeIn(tile, square);
 
-            updateBoard(tile);
+            updateBoard();
 
             placed = true;
           }
@@ -151,7 +151,7 @@ export default function Game(props) {
           if (isIn(pos, slot)) {
             placeIn(tile, slot);
 
-            updateBoard(tile);
+            updateBoard();
 
             placed = true;
           }
@@ -161,25 +161,27 @@ export default function Game(props) {
       if (placed === false) {
         let attrValue = "translate(" + [tile.origin.x, tile.origin.y] + ")";
         tile.setAttribute('transform', attrValue);
-        updateBoard(tile);
+        updateBoard();
       }
     }
   }
 
-  function updateBoard(tile) {
-    tile.wasIn.classList.remove("occupied");
+  function updateBoard() {
+    if (tile['wasIn'] !== undefined) {
+      tile.wasIn.classList.remove("occupied");
 
-    if (wasOnBoard(tile)) {
-      props.updateBoard(null, tile.wasIn.id);
-    }
-    if (isOnBoard(tile)) {
-      props.updateBoard(tile.id, tile.isIn.id);
-    }
-    if (wasInTray(tile)) {
-      props.removeTileFromTray(tile);
-    }
-    if (isInTray(tile)) {
-      props.addTileToTray(tile, tile.isIn);
+      if (wasOnBoard(tile)) {
+        props.updateBoard(null, tile.wasIn.id);
+      }
+      if (isOnBoard(tile)) {
+        props.updateBoard(tile.id, tile.isIn.id);
+      }
+      if (wasInTray(tile)) {
+        props.removeTileFromTray(tile);
+      }
+      if (isInTray(tile)) {
+        props.addTileToTray(tile, tile.isIn);
+      }
     }
 
     tile = null;
@@ -216,7 +218,7 @@ export default function Game(props) {
 
   function renderBoardTiles() {
     for (const property in props.board) {
-      let square = game.current.getElementById(property)
+      let square = game.current.getElementById(property);
       let tile = game.current.getElementById(props.board[property]);
 
       if (!tile) {
@@ -238,7 +240,7 @@ export default function Game(props) {
 
   function renderTrayTiles() {
     props.playerTray.forEach((slot) => {
-      let space = game.current.getElementById(slot.id)
+      let space = game.current.getElementById(slot.id);
       let tile = game.current.getElementById(slot.tile_id);
 
       if (!tile) {
