@@ -36,7 +36,7 @@ class Player {
   }
 
   getNumberOfTiles() {
-    return this.#tiles.length;
+    return this.#tiles.size;
   }
 
   getPlayer() {
