@@ -114,6 +114,20 @@ io.on('connection', (socket) => {
     game.updateStatus();
   });
 
+  socket.on('swap', (data) => {
+    game.getTiles(player);
+
+    data.forEach((tile_id) => {
+      let tile = game.getTile(tile_id);
+      game.addTile(tile);
+    });
+
+    console.log('Player turn complete');
+    game.resetPlayedTiles();
+    game.updatePlayerTurn();
+    game.drawTiles();
+  });
+
   socket.on('update', (data) => {
     let tile = data.tile;
     let square = data.square;

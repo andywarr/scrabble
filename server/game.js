@@ -31,6 +31,10 @@ class Game {
     }
   }
 
+  addTile(tile) {
+    this.#tiles.push(tile);
+  }
+
   doesPlayerExist(id) {
     console.log("Finding player", id);
     return this.players.includes(player => player.id === id);
@@ -69,8 +73,9 @@ class Game {
       selectedTiles.push(...gameTiles.splice(rand, 1));
     }
 
-    this.tiles = gameTiles;
-    player.tiles = [...playerTiles, ...selectedTiles];
+    this.#tiles = gameTiles;
+    player.addTiles(selectedTiles);
+    console.log(player.tiles);
 
     player.updatePlayerTiles();
   }

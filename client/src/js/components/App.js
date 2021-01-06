@@ -257,13 +257,15 @@ class App extends Component {
       ],
       players: [],
       status: status.READY,
-      swap: false
+      swap: false,
+      tilesToSwap: []
     };
 
     this.done = this.done.bind(this);
     this.setName = this.setName.bind(this);
     this.removeTileFromTray = this.removeTileFromTray.bind(this);
     this.setStatus = this.setStatus.bind(this);
+    this.swapTile = this.swapTile.bind(this);
     this.updateBoard = this.updateBoard.bind(this);
     this.addTileToTray = this.addTileToTray.bind(this);
 
@@ -339,15 +341,23 @@ class App extends Component {
         swap: true
       });
     } else {
-      console.log('Player turn complete');
-
       if (this.state.swap === true) {
+        this.state.tilesToSwap.forEach((tile_id) => {
+          let tile = {};
+          tile.id = tile_id;
+          this.removeTileFromTray(tile);
+        });
+
+        this.socket.emit('swap', this.state.tilesToSwap);
+
         this.setState({
           swap: false
         });
+      } else {
+        this.socket.emit('done');
       }
 
-      this.socket.emit('done');
+      console.log('Player turn complete');
     }
   }
 
@@ -362,6 +372,16 @@ class App extends Component {
   setName(name) {
     console.log('Set name', name);
     this.socket.emit('name', { name });
+  }
+
+  swapTile(tile_id) {
+    console.log('Swap tile', tile_id);
+
+    if (this.state.tilesToSwap.includes(tile_id)) {
+      this.state.tilesToSwap.splice(this.state.tilesToSwap.indexOf(tile_id), 1);
+    } else {
+      this.state.tilesToSwap.push(tile_id);
+    }
   }
 
   setStatus(status) {
@@ -449,7 +469,7 @@ class App extends Component {
     return (
       <div>
         <Share status={this.state.status} />
-        <Game board={this.state.board} done={this.done} errorMsg={this.state.errorMsg} playerId={this.state.playerId} playerTray={this.state.playerTray} players={this.state.players} removeTileFromTray={this.removeTileFromTray} setName={this.setName} setStatus={this.setStatus} status={this.state.status} swap={this.state.swap} turn={this.state.turn} updateBoard={this.updateBoard} addTileToTray={this.addTileToTray} />
+        <Game board={this.state.board} done={this.done} errorMsg={this.state.errorMsg} playerId={this.state.playerId} playerTray={this.state.playerTray} players={this.state.players} removeTileFromTray={this.removeTileFromTray} setName={this.setName} setStatus={this.setStatus} status={this.state.status} swap={this.state.swap} swapTile={this.swapTile} turn={this.state.turn} updateBoard={this.updateBoard} addTileToTray={this.addTileToTray} />
       </div>
     );
   }

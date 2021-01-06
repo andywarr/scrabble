@@ -57,6 +57,10 @@ export default function Game(props) {
     return el.isIn.classList.contains('tray');
   }
 
+  function isSwappable() {
+    return props.swap;
+  }
+
   function wasOnBoard(el) {
     return el.wasIn.classList.contains('board');
   }
@@ -66,7 +70,7 @@ export default function Game(props) {
   }
 
   function handleMouseDown(e) {
-    if (isTile(e.target) && isDraggable(e.target)) {
+    if (isTile(e.target) && isDraggable(e.target) && !isSwappable()) {
       // select the g element
       tile = e.target.parentNode;
 
@@ -79,11 +83,13 @@ export default function Game(props) {
       tile.size = getSize(tile);
       tile.origin = getSVGPosition(dimens.left, dimens.top);
       tile.offset = {x: pos.x - tile.origin.x, y: pos.y - tile.origin.y};
+    } else if (isTile(e.target) && isDraggable(e.target) && isSwappable()) {
+      tile = e.target.parentNode;
     }
   }
 
   function handleMouseMove(e) {
-    if (tile) {
+    if (tile && !isSwappable()) {
       let pos = getSVGPosition(e.clientX, e.clientY);
 
       let x;
@@ -118,7 +124,7 @@ export default function Game(props) {
   }
 
   function handleMouseUp(e) {
-    if (tile) {
+    if (tile && !isSwappable()) {
       let pos = getSVGPosition(e.clientX, e.clientY);
 
       let placed = false;
@@ -167,6 +173,18 @@ export default function Game(props) {
         updateBoard();
       }
     }
+    else if (tile && isSwappable()) {
+      console.log("SWAP");
+      if (tile.childNodes[0].classList.contains('swap')) {
+        tile.childNodes[0].classList.remove('swap');
+      } else {
+        tile.childNodes[0].classList.add('swap');
+      }
+
+      props.swapTile(tile.id);
+    }
+
+    tile = null;
   }
 
   function updateBoard() {
@@ -186,8 +204,6 @@ export default function Game(props) {
         props.addTileToTray(tile, tile.isIn);
       }
     }
-
-    tile = null;
   }
 
   function isIn(pos, el) {
@@ -248,6 +264,11 @@ export default function Game(props) {
 
       if (!tile) {
         space.classList.remove("occupied");
+        if(space.hasOwnProperty('tile')) {
+          space.tile.classList.add("closed");
+          space.tile.childNodes[0].classList.remove("swap");
+          delete space.tile;
+        }
       }
       else {
         placeIn(tile, space);

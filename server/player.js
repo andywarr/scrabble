@@ -18,6 +18,14 @@ class Player {
     this.#tiles.add(tile)
   }
 
+  addTiles(tiles) {
+    console.log("Add tiles", tiles);
+    tiles.forEach((tile) => {
+      this.#tiles.add(tile);
+    });
+
+  }
+
   removeTile(tile_id) {
     console.log("Remove tile", tile_id);
     this.#tiles.forEach((tile) => {
