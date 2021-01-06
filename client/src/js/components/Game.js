@@ -70,6 +70,7 @@ export default function Game(props) {
       // select the g element
       tile = e.target.parentNode;
 
+      // Move the tile to bottom of the group of tiles so it renders on top of other tiles
       game.current.getElementById('Tiles').appendChild(tile);
 
       let dimens = tile.getClientRects()[0];
@@ -1532,7 +1533,7 @@ export default function Game(props) {
       <div id="player-container" className="column">
         <Players playerId={props.playerId} players={props.players} setName={props.setName} turn={props.turn} />
         <Set setStatus={props.setStatus} status={props.status} />
-        <Turn done={props.done} errorMsg={props.errorMsg} playerId={props.playerId} status={props.status} turn={props.turn} />
+        <Turn done={props.done} errorMsg={props.errorMsg} playerId={props.playerId} status={props.status} swap={props.swap} turn={props.turn} />
       </div>
     </div>
   );

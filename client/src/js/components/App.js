@@ -256,7 +256,8 @@ class App extends Component {
         {id: "slot_7", tile_id: null},
       ],
       players: [],
-      status: status.READY
+      status: status.READY,
+      swap: false
     };
 
     this.done = this.done.bind(this);
@@ -318,10 +319,36 @@ class App extends Component {
     return tileInTray;
   }
 
-  // TODO: Need to update player tiles, tiles played, etc...
+  isTrayFull() {
+    let isTrayFull = true;
+
+    this.state.playerTray.forEach((slot) => {
+      if (slot.tile_id === null) {
+        isTrayFull = false;
+      }
+    });
+
+    return isTrayFull;
+  }
+
   done() {
-    console.log('Player turn complete');
-    this.socket.emit('done');
+    // TODO (andywarr): If the player has not played any tiles allow them to swap
+    if (this.isTrayFull() && this.state.swap === false) {
+      console.log('Player tray is full');
+      this.setState({
+        swap: true
+      });
+    } else {
+      console.log('Player turn complete');
+
+      if (this.state.swap === true) {
+        this.setState({
+          swap: false
+        });
+      }
+
+      this.socket.emit('done');
+    }
   }
 
   getGameId() {
@@ -422,7 +449,7 @@ class App extends Component {
     return (
       <div>
         <Share status={this.state.status} />
-        <Game board={this.state.board} done={this.done} errorMsg={this.state.errorMsg} playerId={this.state.playerId} playerTray={this.state.playerTray} players={this.state.players} removeTileFromTray={this.removeTileFromTray} setName={this.setName} setStatus={this.setStatus} status={this.state.status} turn={this.state.turn} updateBoard={this.updateBoard} addTileToTray={this.addTileToTray} />
+        <Game board={this.state.board} done={this.done} errorMsg={this.state.errorMsg} playerId={this.state.playerId} playerTray={this.state.playerTray} players={this.state.players} removeTileFromTray={this.removeTileFromTray} setName={this.setName} setStatus={this.setStatus} status={this.state.status} swap={this.state.swap} turn={this.state.turn} updateBoard={this.updateBoard} addTileToTray={this.addTileToTray} />
       </div>
     );
   }
