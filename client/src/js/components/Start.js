@@ -138,7 +138,7 @@ class Start extends Component {
 
     if (play) {
       setTimeout(function() {
-        window.location.href = './play/12345678';
+        window.location.href = `./play/${Math.floor(Math.random() * 1000000000);}`;
       }.bind(this), 500);
     }
   }
