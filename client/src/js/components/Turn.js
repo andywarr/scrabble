@@ -21,7 +21,7 @@ export default function Turn(props) {
   function isVisible() {
     let visible = false;
 
-    if (props.status === status.GO) {
+    if (props.status >= status.GO) {
       visible = true;
     }
 
