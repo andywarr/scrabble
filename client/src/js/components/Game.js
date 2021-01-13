@@ -265,7 +265,7 @@ export default function Game(props) {
       if (!tile) {
         space.classList.remove("occupied");
         if(space.hasOwnProperty('tile')) {
-          space.tile.classList.add("closed");
+          //space.tile.classList.add("closed");
           space.tile.childNodes[0].classList.remove("swap");
           delete space.tile;
         }
