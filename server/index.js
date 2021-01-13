@@ -156,7 +156,7 @@ io.on('connection', (socket) => {
         game.status = READY;
         game.updateStatus();
       }
-    }  else if (game.status === GO) {
+    }  else if (game.status >= GO) {
       if (game.getNumberOfPlayers() === 0) {
         // Remove game
         games.removeGame(game.id);

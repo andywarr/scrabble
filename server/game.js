@@ -66,6 +66,9 @@ class Game {
 
     if (tilesNeeded > gameTiles.length) {
       numberOfTilesToDraw = gameTiles.length;
+
+      this.#status = 3;
+      updateStatus();
     }
 
     while (numberOfTilesToDraw--) {
