@@ -334,8 +334,7 @@ class App extends Component {
   }
 
   done() {
-    // TODO (andywarr): If the player has not played any tiles allow them to swap
-    if (this.isTrayFull() && this.state.swap === false) {
+    if (this.isTrayFull() && this.state.swap === false && this.state.status === status.GO) {
       console.log('Player tray is full');
       this.setState({
         swap: true

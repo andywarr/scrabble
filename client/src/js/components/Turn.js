@@ -9,8 +9,12 @@ export default function Turn(props) {
     if (props.playerId === props.turn) {
       if(props.swap) {
         return Swap();
-      } else {
+      }
+      else if (!props.swap && props.status === status.GO) {
         return Turn();
+      }
+      else if (!props.swap && props.status > status.GO) {
+        return LastTurn();
       }
     }
     else {
@@ -35,6 +39,21 @@ export default function Turn(props) {
         <p>Drag tiles from your tray onto the board to spell words.</p>
         <p>If you do not drag any tiles onto the board you will have the option to swap all or some of your tiles.</p>
         <p>When you have finished spelling words or you want to swap tiles, press 'Done'</p>
+        <p className="error">{props.errorMsg}</p>
+        <input onClick={() => props.done()}
+               type="button"
+               value="Done" />
+      </div>
+    );
+  }
+
+  function LastTurn() {
+    return (
+      <div>
+        <p>It's your turn.</p>
+        <p>Drag tiles from your tray onto the board to spell words.</p>
+        <p>You do not have the option to swap all or some of your tiles as there are no more tiles.</p>
+        <p>When you have finished spelling words, press 'Done'</p>
         <p className="error">{props.errorMsg}</p>
         <input onClick={() => props.done()}
                type="button"

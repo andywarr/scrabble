@@ -283,7 +283,7 @@ export default function Game(props) {
   }
 
   useEffect(() => {
-    if (props.status >= 2) {
+    // if (props.status >= 2) {
       let topLeft = getSVGPosition(game.current.getClientRects()[0].left, game.current.getClientRects()[0].top);
       let bottomRight = getSVGPosition(game.current.getClientRects()[0].right, game.current.getClientRects()[0].bottom);
 
@@ -294,7 +294,7 @@ export default function Game(props) {
 
       renderBoardTiles();
       renderTrayTiles();
-    }
+    // }
   });
 
   return (
