@@ -128,6 +128,13 @@ class Game {
     return this.players.map(player => player.getPlayer())
   }
 
+  isGameOver() {
+    const gameTiles = [...this.tiles];
+    const playerTiles = [...player.tiles];
+
+    return !gameTiles.length && !playerTiles.length;
+  }
+
   removePlayer(id) {
     console.log("Removing player", id);
     this.players = this.players.filter(player => player.id !== id);
