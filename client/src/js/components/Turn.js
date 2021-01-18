@@ -29,6 +29,8 @@ export default function Turn(props) {
       visible = true;
     }
 
+    console.log(visible);
+
     return visible;
   }
 
