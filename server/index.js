@@ -68,6 +68,7 @@ io.on('connection', (socket) => {
       game.drawTiles();
     } else {
       console.log('Game over');
+      game.endGame();
     }
   });
 

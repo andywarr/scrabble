@@ -44,6 +44,29 @@ class Game {
     this.players.forEach(player => this.getTiles(player));
   }
 
+  endGame() {
+    let total_score = 0;
+
+    this.players.forEach(player => {
+      let score = 0;
+
+      player.tiles.forEach((tile) => {
+        score += tile.score;
+      });
+
+      player.reducePlayerScore(score);
+      total_score += score;
+    });
+
+    let player = this.players[this.playerTurnIndex];
+    player.updatePlayerScore(total_score);
+
+    this.updatePlayers();
+
+    this.status = 4;
+    this.players.forEach(player => player.socket.emit('status', { status: this.status }));
+  }
+
   getTile(tile_id) {
     let _tile;
 
@@ -130,7 +153,7 @@ class Game {
 
   isGameOver() {
     const gameTiles = [...this.tiles];
-    const playerTiles = [...player.tiles];
+    const playerTiles = [...this.players[this.playerTurnIndex].tiles];
 
     return !gameTiles.length && !playerTiles.length;
   }

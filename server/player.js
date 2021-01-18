@@ -87,6 +87,10 @@ class Player {
     this.#tiles = new Set(tiles);
   }
 
+  reducePlayerScore(score) {
+    this.#score -= score;
+  }
+
   updatePlayerScore(score) {
     this.#score += score;
   }
