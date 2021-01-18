@@ -189,7 +189,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) *
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"status\", function() { return status; });\nvar status = {\n  READY: 0,\n  SET: 1,\n  GO: 2\n};\n\n//# sourceURL=webpack:///./client/src/js/config.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"status\", function() { return status; });\nvar status = {\n  READY: 0,\n  SET: 1,\n  GO: 2,\n  FINAL: 3,\n  END: 4\n};\n\n//# sourceURL=webpack:///./client/src/js/config.js?");
 
 /***/ }),
 
