@@ -13,8 +13,8 @@ export default function Turn(props) {
       else if (!props.swap && props.status === status.GO) {
         return Turn();
       }
-      else if (!props.swap && props.status > status.GO) {
-        return LastTurn();
+      else if (!props.swap && props.status === status.FINAL) {
+        return FinalTurn();
       }
     }
     else {
@@ -25,7 +25,7 @@ export default function Turn(props) {
   function isVisible() {
     let visible = false;
 
-    if (props.status >= status.GO) {
+    if (props.status >= status.GO && props.status < status.END) {
       visible = true;
     }
 
@@ -47,7 +47,7 @@ export default function Turn(props) {
     );
   }
 
-  function LastTurn() {
+  function FinalTurn() {
     return (
       <div>
         <p>It's your turn.</p>
