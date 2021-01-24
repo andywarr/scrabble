@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
 // Import components
+import End from "./End";
 import Players from "./Players";
 import Set from "./Set";
 import Turn from "./Turn";
@@ -1554,6 +1555,7 @@ export default function Game(props) {
         <Players playerId={props.playerId} players={props.players} setName={props.setName} turn={props.turn} />
         <Set setStatus={props.setStatus} status={props.status} />
         <Turn done={props.done} errorMsg={props.errorMsg} playerId={props.playerId} status={props.status} swap={props.swap} turn={props.turn} />
+        <End status={props.status} />
       </div>
     </div>
   );
