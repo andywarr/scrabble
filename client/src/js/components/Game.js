@@ -266,7 +266,10 @@ export default function Game(props) {
       if (!tile) {
         space.classList.remove("occupied");
         if(space.hasOwnProperty('tile')) {
-          space.tile.childNodes[0].classList.remove("swap");
+          if(space.tile.childNodes[0].classList.contains('swap')) {
+            space.tile.classList.add("closed");
+            space.tile.childNodes[0].classList.remove("swap");
+          }
           delete space.tile;
         }
       }
