@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 // Import components
 import End from "./End";
 import Players from "./Players";
-import Set from "./Set";
+import SetPanel from "./Set";
 import Turn from "./Turn";
 
 import '../../css/game.scss';
@@ -282,7 +282,7 @@ export default function Game(props) {
 
   function renderTrayTiles() {
     const activeTile = dragRef.current.tile;
-    const swapSelection = new Set(props.swap && props.tilesToSwap ? props.tilesToSwap : []);
+    const swapSelection = props.swap && props.tilesToSwap ? props.tilesToSwap : [];
 
     props.playerTray.forEach((slot) => {
       let space = game.current.getElementById(slot.id);
@@ -303,7 +303,7 @@ export default function Game(props) {
           placeIn(tileEl, space);
         }
 
-        if (swapSelection.has(tileEl.id)) {
+        if (swapSelection.includes(tileEl.id)) {
           tileEl.childNodes[0].classList.add("swap");
         } else {
           tileEl.childNodes[0].classList.remove("swap");
@@ -1599,7 +1599,7 @@ export default function Game(props) {
       </div>
       <div id="player-container" className="column">
         <Players playerId={props.playerId} players={props.players} setName={props.setName} turn={props.turn} />
-        <Set setStatus={props.setStatus} status={props.status} />
+        <SetPanel setStatus={props.setStatus} status={props.status} />
         <Turn cancelSwap={props.cancelSwap} done={props.done} errorMsg={props.errorMsg} playerId={props.playerId} status={props.status} swap={props.swap} turn={props.turn} />
         <End players={props.players} status={props.status} />
       </div>
