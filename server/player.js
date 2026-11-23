@@ -14,16 +14,29 @@ class Player {
   }
 
   addTile(tile) {
+    if (!tile || this.hasTile(tile.id)) {
+      return;
+    }
     console.log("Add tile", tile);
-    this.#tiles.add(tile)
+    this.#tiles.add(tile);
   }
 
   addTiles(tiles) {
     console.log("Add tiles", tiles);
     tiles.forEach((tile) => {
-      this.#tiles.add(tile);
+      if (tile && !this.hasTile(tile.id)) {
+        this.#tiles.add(tile);
+      }
     });
+  }
 
+  hasTile(tile_id) {
+    for (const tile of this.#tiles) {
+      if (tile.id === tile_id) {
+        return true;
+      }
+    }
+    return false;
   }
 
   removeTile(tile_id) {

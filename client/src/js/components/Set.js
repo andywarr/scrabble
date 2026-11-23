@@ -17,7 +17,7 @@ export default function Set(props) {
 
   return (
     <div id="player-info-container" className={isVisible() ? "" : "closed"}>
-      <p>Waiting for players to join. Once all players have joined, please the Start button. New players cannot join the game once it has started.</p>
+      <p>Waiting for players to join. Once all players have joined, press the Start button. New players cannot join the game once it has started.</p>
       <input onClick={() => props.setStatus(status.GO)}
              type="button"
              value="Start" />

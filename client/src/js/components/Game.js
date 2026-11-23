@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 // Import components
 import End from "./End";
@@ -8,12 +8,16 @@ import Turn from "./Turn";
 
 import '../../css/game.scss';
 
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
 export default function Game(props) {
 
   const game = useRef(null);
-  const boundary = {};
-
-  let tile = null;
+  const dragRef = useRef({
+    tile: null,
+    boundary: { left: 0, top: 0, right: 0, bottom: 0 }
+  });
+  const [pendingBlankTile, setPendingBlankTile] = useState(null);
 
   function getSVGPosition(x, y) {
     let CTM = game.current.getScreenCTM();
@@ -39,7 +43,7 @@ export default function Game(props) {
   }
 
   function isDraggable(el) {
-    return el.parentNode.classList.contains('draggable');
+    return el.parentNode && el.parentNode.classList && el.parentNode.classList.contains('draggable');
   }
 
   function isOccupied(el) {
@@ -47,15 +51,19 @@ export default function Game(props) {
   }
 
   function isTile(el) {
-    return el.parentNode.classList.contains('tile');
+    return el.parentNode && el.parentNode.classList && el.parentNode.classList.contains('tile');
+  }
+
+  function isBlankTileId(id) {
+    return id === '_1' || id === '_2';
   }
 
   function isOnBoard(el) {
-    return el.isIn.classList.contains('board');
+    return el.isIn && el.isIn.classList.contains('board');
   }
 
   function isInTray(el) {
-    return el.isIn.classList.contains('tray');
+    return el.isIn && el.isIn.classList.contains('tray');
   }
 
   function isSwappable() {
@@ -63,69 +71,60 @@ export default function Game(props) {
   }
 
   function wasOnBoard(el) {
-    return el.wasIn.classList.contains('board');
+    return el.wasIn && el.wasIn.classList.contains('board');
   }
 
   function wasInTray(el) {
-    return el.wasIn.classList.contains('tray');
+    return el.wasIn && el.wasIn.classList.contains('tray');
   }
 
   function handleMouseDown(e) {
+    if (pendingBlankTile) {
+      return;
+    }
+
     if (isTile(e.target) && isDraggable(e.target) && !isSwappable()) {
       // select the g element
-      tile = e.target.parentNode;
+      const activeTile = e.target.parentNode;
+      dragRef.current.tile = activeTile;
 
       // Move the tile to bottom of the group of tiles so it renders on top of other tiles
-      game.current.getElementById('Tiles').appendChild(tile);
+      game.current.getElementById('Tiles').appendChild(activeTile);
 
-      let dimens = tile.getClientRects()[0];
+      let dimens = activeTile.getClientRects()[0];
       let pos = getSVGPosition(e.clientX, e.clientY);
 
-      tile.size = getSize(tile);
-      tile.origin = getSVGPosition(dimens.left, dimens.top);
-      tile.offset = {x: pos.x - tile.origin.x, y: pos.y - tile.origin.y};
+      activeTile.size = getSize(activeTile);
+      activeTile.origin = getSVGPosition(dimens.left, dimens.top);
+      activeTile.offset = {x: pos.x - activeTile.origin.x, y: pos.y - activeTile.origin.y};
     } else if (isTile(e.target) && isDraggable(e.target) && isSwappable()) {
-      tile = e.target.parentNode;
+      dragRef.current.tile = e.target.parentNode;
     }
   }
 
   function handleMouseMove(e) {
-    if (tile && !isSwappable()) {
+    const activeTile = dragRef.current.tile;
+    const boundary = dragRef.current.boundary;
+
+    if (activeTile && !isSwappable()) {
       let pos = getSVGPosition(e.clientX, e.clientY);
 
-      let x;
-      let y;
+      let x = pos.x - activeTile.offset.x;
+      let y = pos.y - activeTile.offset.y;
 
-      // Calculate X coordinate
-      if (pos.x <= tile.offset.x + boundary.x) {
-        x = boundary.left;
-      }
-      else if (pos.x + tile.size >= boundary.x) {
-        x = boundary.right - tile.size - tile.offset.x;
-      }
-      else {
-        x = pos.x - tile.offset.x;
-      }
-
-      // Calculate Y coordinate
-      if (pos.y <= tile.offset.y + boundary.y) {
-        y = boundary.top;
-      }
-      else if (pos.y + tile.size >= boundary.y) {
-        y = boundary.bottom - tile.size - tile.offset.y;
-      }
-      else {
-        y = pos.y - tile.offset.y;
-      }
+      x = Math.max(boundary.left, Math.min(boundary.right - activeTile.size, x));
+      y = Math.max(boundary.top, Math.min(boundary.bottom - activeTile.size, y));
 
       // Set X, Y coordinate
       let attrValue = "translate(" + [x, y] + ")";
-      tile.setAttribute('transform', attrValue);
+      activeTile.setAttribute('transform', attrValue);
     }
   }
 
   function handleMouseUp(e) {
-    if (tile && !isSwappable()) {
+    const activeTile = dragRef.current.tile;
+
+    if (activeTile && !isSwappable()) {
       let pos = getSVGPosition(e.clientX, e.clientY);
 
       let placed = false;
@@ -134,15 +133,15 @@ export default function Game(props) {
       let squares = game.current.getElementById('Board').childNodes;
 
       squares.forEach((square) => {
-        if(!isOccupied(square)) {
+        if (!placed && !isOccupied(square)) {
           square.dimens = square.getClientRects()[0];
           square.pos = getSVGPosition(square.dimens.x, square.dimens.y);
           square.size = getSize(square);
 
           if (isIn(pos, square)) {
-            placeIn(tile, square);
+            placeIn(activeTile, square);
 
-            updateBoard();
+            updateBoard(activeTile);
 
             placed = true;
           }
@@ -150,60 +149,70 @@ export default function Game(props) {
       });
 
       // Check if tile is placed in the tray
-      let slots = game.current.getElementById('Tray').childNodes;
+      if (!placed) {
+        let slots = game.current.getElementById('Tray').childNodes;
 
-      slots.forEach((slot) => {
-        if(!isOccupied(slot)) {
-          slot.dimens = slot.getClientRects()[0];
-          slot.pos = getSVGPosition(slot.dimens.x, slot.dimens.y);
-          slot.size = getSize(slot);
+        slots.forEach((slot) => {
+          if (!placed && !isOccupied(slot)) {
+            slot.dimens = slot.getClientRects()[0];
+            slot.pos = getSVGPosition(slot.dimens.x, slot.dimens.y);
+            slot.size = getSize(slot);
 
-          if (isIn(pos, slot)) {
-            placeIn(tile, slot);
+            if (isIn(pos, slot)) {
+              placeIn(activeTile, slot);
 
-            updateBoard();
+              updateBoard(activeTile);
 
-            placed = true;
+              placed = true;
+            }
           }
-        }
-      });
+        });
+      }
 
       if (placed === false) {
-        let attrValue = "translate(" + [tile.origin.x, tile.origin.y] + ")";
-        tile.setAttribute('transform', attrValue);
-        updateBoard();
+        let attrValue = "translate(" + [activeTile.origin.x, activeTile.origin.y] + ")";
+        activeTile.setAttribute('transform', attrValue);
       }
     }
-    else if (tile && isSwappable()) {
-      console.log("SWAP");
-      if (tile.childNodes[0].classList.contains('swap')) {
-        tile.childNodes[0].classList.remove('swap');
-      } else {
-        tile.childNodes[0].classList.add('swap');
+    else if (activeTile && isSwappable()) {
+      if (isInTray(activeTile)) {
+        props.swapTile(activeTile.id);
       }
-
-      props.swapTile(tile.id);
     }
 
-    tile = null;
+    dragRef.current.tile = null;
   }
 
-  function updateBoard() {
-    if (tile['wasIn'] !== undefined) {
-      tile.wasIn.classList.remove("occupied");
+  function updateBoard(activeTile) {
+    if (activeTile['wasIn'] !== undefined) {
+      activeTile.wasIn.classList.remove("occupied");
 
-      if (wasOnBoard(tile)) {
-        props.updateBoard(null, tile.wasIn.id);
+      if (wasOnBoard(activeTile)) {
+        props.updateBoard(null, activeTile.wasIn.id);
       }
-      if (isOnBoard(tile)) {
-        props.updateBoard(tile.id, tile.isIn.id);
+      if (isOnBoard(activeTile)) {
+        const existingLetter = props.blankLetters && props.blankLetters[activeTile.id] ? props.blankLetters[activeTile.id] : null;
+        props.updateBoard(activeTile.id, activeTile.isIn.id, existingLetter);
+        if (isBlankTileId(activeTile.id) && !existingLetter) {
+          setPendingBlankTile(activeTile.id);
+        }
       }
-      if (wasInTray(tile)) {
-        props.removeTileFromTray(tile);
+      if (wasInTray(activeTile)) {
+        props.removeTileFromTray(activeTile);
       }
-      if (isInTray(tile)) {
-        props.addTileToTray(tile, tile.isIn);
+      if (isInTray(activeTile)) {
+        if (pendingBlankTile === activeTile.id) {
+          setPendingBlankTile(null);
+        }
+        props.addTileToTray(activeTile, activeTile.isIn);
       }
+    }
+  }
+
+  function handleSelectBlankLetter(letter) {
+    if (pendingBlankTile) {
+      props.setBlankLetter(pendingBlankTile, letter.toLowerCase());
+      setPendingBlankTile(null);
     }
   }
 
@@ -227,6 +236,13 @@ export default function Game(props) {
     let attrValue = "translate(" + [x, y] + ")";
     el.setAttribute('transform', attrValue);
 
+    if (el.isIn && el.isIn !== into) {
+      el.isIn.classList.remove("occupied");
+      if (el.isIn.tile === el) {
+        delete el.isIn.tile;
+      }
+    }
+
     el.wasIn = el.isIn;
     el.isIn = into;
 
@@ -237,69 +253,86 @@ export default function Game(props) {
   }
 
   function renderBoardTiles() {
+    const activeTile = dragRef.current.tile;
+
     for (const property in props.board) {
       let square = game.current.getElementById(property);
-      let tile = game.current.getElementById(props.board[property]);
+      let tileEl = game.current.getElementById(props.board[property]);
 
-      if (!tile) {
+      if (!tileEl) {
         square.classList.remove("occupied");
-        if(square.hasOwnProperty('tile')) {
-          square.tile.classList.add("closed");
+        if (square.hasOwnProperty('tile')) {
+          if (square.tile !== activeTile && square.tile.isIn === square) {
+            square.tile.classList.add("closed");
+          }
           delete square.tile;
         }
       }
       else {
-        placeIn(tile, square);
+        if (tileEl !== activeTile) {
+          placeIn(tileEl, square);
+        }
 
         if (props.playerId !== props.turn) {
-          tile.classList.remove("draggable");
+          tileEl.classList.remove("draggable");
         }
       }
     }
   }
 
   function renderTrayTiles() {
+    const activeTile = dragRef.current.tile;
+    const swapSelection = new Set(props.swap && props.tilesToSwap ? props.tilesToSwap : []);
+
     props.playerTray.forEach((slot) => {
       let space = game.current.getElementById(slot.id);
-      let tile = game.current.getElementById(slot.tile_id);
+      let tileEl = game.current.getElementById(slot.tile_id);
 
-      if (!tile) {
+      if (!tileEl) {
         space.classList.remove("occupied");
-        if(space.hasOwnProperty('tile')) {
-          if(space.tile.childNodes[0].classList.contains('swap')) {
+        if (space.hasOwnProperty('tile')) {
+          if (space.tile !== activeTile && space.tile.isIn === space) {
             space.tile.classList.add("closed");
-            space.tile.childNodes[0].classList.remove("swap");
           }
+          space.tile.childNodes[0].classList.remove("swap");
           delete space.tile;
         }
       }
       else {
-        placeIn(tile, space);
+        if (tileEl !== activeTile) {
+          placeIn(tileEl, space);
+        }
+
+        if (swapSelection.has(tileEl.id)) {
+          tileEl.childNodes[0].classList.add("swap");
+        } else {
+          tileEl.childNodes[0].classList.remove("swap");
+        }
 
         if (props.playerId === props.turn) {
-          tile.classList.add("draggable");
+          tileEl.classList.add("draggable");
         }
         else {
-          tile.classList.remove("draggable");
+          tileEl.classList.remove("draggable");
         }
       }
     });
   }
 
   useEffect(() => {
-    // if (props.status >= 2) {
-      let topLeft = getSVGPosition(game.current.getClientRects()[0].left, game.current.getClientRects()[0].top);
-      let bottomRight = getSVGPosition(game.current.getClientRects()[0].right, game.current.getClientRects()[0].bottom);
+    let topLeft = getSVGPosition(game.current.getClientRects()[0].left, game.current.getClientRects()[0].top);
+    let bottomRight = getSVGPosition(game.current.getClientRects()[0].right, game.current.getClientRects()[0].bottom);
 
-      boundary.left = topLeft.x;
-      boundary.top = topLeft.y;
-      boundary.bottom = bottomRight.y;
-      boundary.right = bottomRight.x;
+    dragRef.current.boundary = {
+      left: topLeft.x,
+      top: topLeft.y,
+      bottom: bottomRight.y,
+      right: bottomRight.x
+    };
 
-      renderBoardTiles();
-      renderTrayTiles();
-    // }
-  });
+    renderBoardTiles();
+    renderTrayTiles();
+  }, [props.board, props.playerTray, props.turn, props.playerId, props.swap, props.tilesToSwap, props.blankLetters]);
 
   return (
     <div id="game-container">
@@ -1546,9 +1579,19 @@ export default function Game(props) {
       </g>
       <g id="_1" className="closed draggable tile">
       <rect x="0" y="0" width="88" height="88" rx="4" fill="#FEFEFE"/>
+      {props.blankLetters && props.blankLetters._1 ? (
+        <text x="44" y="60" textAnchor="middle" fontSize="54" fontWeight="bold" fill="#1976D2" style={{ userSelect: "none" }}>
+          {props.blankLetters._1.toUpperCase()}
+        </text>
+      ) : null}
       </g>
       <g id="_2" className="closed draggable tile">
       <rect x="0" y="0" width="88" height="88" rx="4" fill="#FEFEFE"/>
+      {props.blankLetters && props.blankLetters._2 ? (
+        <text x="44" y="60" textAnchor="middle" fontSize="54" fontWeight="bold" fill="#1976D2" style={{ userSelect: "none" }}>
+          {props.blankLetters._2.toUpperCase()}
+        </text>
+      ) : null}
       </g>
       </g>
       </g>
@@ -1557,9 +1600,31 @@ export default function Game(props) {
       <div id="player-container" className="column">
         <Players playerId={props.playerId} players={props.players} setName={props.setName} turn={props.turn} />
         <Set setStatus={props.setStatus} status={props.status} />
-        <Turn done={props.done} errorMsg={props.errorMsg} playerId={props.playerId} status={props.status} swap={props.swap} turn={props.turn} />
-        <End status={props.status} />
+        <Turn cancelSwap={props.cancelSwap} done={props.done} errorMsg={props.errorMsg} playerId={props.playerId} status={props.status} swap={props.swap} turn={props.turn} />
+        <End players={props.players} status={props.status} />
       </div>
+      {pendingBlankTile ? (
+        <div>
+          <div className="modal-overlay"></div>
+          <div className="modal blank-picker-modal">
+            <div className="modal-container">
+              <h2>Choose a letter for the blank tile</h2>
+              <div className="blank-letter-grid">
+                {ALPHABET.map((letter) => (
+                  <button
+                    key={letter}
+                    type="button"
+                    className="blank-letter-btn"
+                    onClick={() => handleSelectBlankLetter(letter)}
+                  >
+                    {letter}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

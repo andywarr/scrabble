@@ -4,13 +4,14 @@ var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var path = require('path');
 
+const Dictionary = require('./dictionary.js');
+const Game = require('./game.js');
 const Games = require('./games.js');
 const Player = require('./player.js');
 
-const READY = 0;
-const SET = 1;
-const GO = 2;
+const { READY, SET, GO, FINAL } = Game.STATUS;
 
+var dictionary = new Dictionary();
 var games = new Games();
 
 app.use('/static', express.static('./client/dist'));
@@ -20,7 +21,6 @@ app.get('/', (req, res) => {
 });
 
 app.get('/play/:gameId', (req, res) => {
-  var gameId = req.params.gameId;
   res.sendFile(path.resolve(__dirname + '/../client/dist/game.html'));
 });
 
@@ -31,143 +31,186 @@ io.on('connection', (socket) => {
   var player = new Player(socket);
   var game = null;
 
+  function isActiveTurn() {
+    if (!game) {
+      return false;
+    }
+    if (game.status !== GO && game.status !== FINAL) {
+      return false;
+    }
+    const currentPlayer = game.getPlayerTurn();
+    return Boolean(currentPlayer && currentPlayer.id === player.id);
+  }
+
   socket.on('addTile', (data) => {
+    if (!isActiveTurn() || !data || !data.tile_id) {
+      return;
+    }
     var tile_id = data.tile_id;
     var tile = game.getTile(tile_id);
+    if (!tile) {
+      return;
+    }
+    const inBag = game.tiles.some(t => t.id === tile_id);
+    const onBoard = Object.values(game.board).includes(tile_id);
+    const ownedByOther = game.players.some(p => p.id !== player.id && p.hasTile(tile_id));
+    if (inBag || onBoard || ownedByOther) {
+      return;
+    }
     console.log(tile);
     player.addTile(tile);
   });
 
   socket.on('removeTile', (data) => {
+    if (!isActiveTurn() || !data || !data.tile_id) {
+      return;
+    }
     var tile_id = data.tile_id;
     player.removeTile(tile_id);
   });
 
+  socket.on('blankLetter', (data) => {
+    if (!isActiveTurn() || !data) {
+      return;
+    }
+    game.setBlankLetter(data.tile, data.letter);
+  });
+
   socket.on('done', () => {
-    if (!game.isTileOnCenterSquare()) {
-      console.log('A tile is not on the center square');
-      player.socket.emit('issue', { code: 1, msg: "A tile needs to be placed in the center square." });
+    if (!isActiveTurn()) {
       return;
     }
 
-    if (!game.isTileConnected()) {
-      console.log('A tile is incorrectly placed');
-      player.socket.emit('issue', { code: 1, msg: "Words need to be connected to existing words." });
+    const validation = game.validatePlay(dictionary);
+    if (!validation.valid) {
+      console.log('Invalid play:', validation.msg);
+      player.socket.emit('issue', { code: 1, msg: validation.msg });
+      return;
+    }
+
+    if (validation.isPass) {
+      console.log('Player passed turn');
+      game.recordPass();
+      if (game.isStalemate()) {
+        console.log('Game over (stalemate)');
+        game.endGame(false);
+      } else {
+        game.resetPlayedTiles();
+        game.updatePlayerTurn();
+      }
       return;
     }
 
     let score = game.score();
-    // TODO (andywarr): When scoring a game we can check for the check spelling of a word. If not correct we can return a score of null, which will indicate an invalid word
     player.updatePlayerScore(score);
+    game.resetConsecutivePasses();
 
-    if(!game.isGameOver()) {
+    if (!game.isOutOfTiles()) {
       console.log('Player turn complete');
       game.updatePlayers();
       game.resetPlayedTiles();
+      game.getTiles(player);
       game.updatePlayerTurn();
-      game.drawTiles();
     } else {
       console.log('Game over');
-      game.endGame();
+      game.endGame(true);
     }
   });
 
   socket.on('game', (data) => {
+    if (game || !data || !data.gameId) {
+      return;
+    }
+
     var gameId = data.gameId;
-    game = games.getGame(gameId);
+    var targetGame = games.getGame(gameId);
 
-    if(!game) {
+    if (!targetGame) {
       console.log('Game does not exist');
-      game = games.createGame(gameId);
+      targetGame = games.createGame(gameId);
     }
 
-    if (game.getNumberOfPlayers() < 4) {
-        game.addPlayer(player);
-
-        if (game.getNumberOfPlayers() >= 2) {
-          game.status = SET;
-        }
-
-        game.updatePlayers();
-        game.updateStatus();
-    } else {
-      // Maximum number of players
-      player.socket.emit('issue', { msg: "full" });
+    if (targetGame.status >= GO) {
+      player.socket.emit('issue', { code: 2, msg: "This game has already started." });
+      return;
     }
+
+    if (targetGame.getNumberOfPlayers() >= 4) {
+      player.socket.emit('issue', { code: 2, msg: "This game is full." });
+      return;
+    }
+
+    game = targetGame;
+    game.addPlayer(player);
+
+    if (game.status === READY && game.getNumberOfPlayers() >= 2) {
+      game.status = SET;
+    }
+
+    game.updatePlayers();
+    game.updateStatus();
   });
 
   socket.on('name', (data) => {
-    let name = data.name;
-
-    if (name) {
-      player.name = name;
+    if (!game || !data || typeof data.name !== 'string') {
+      return;
     }
 
+    player.name = data.name;
     game.updatePlayers();
   });
 
   socket.on('status', (data) => {
-    let status = data.status;
-
-    if (status === GO) {
-      game.status = GO;
-      // START GAME
-      game.updatePlayerTurn();
-      game.drawTiles();
+    if (!game || !data) {
+      return;
     }
 
-    game.updateStatus();
+    let status = data.status;
+
+    if (status === GO && game.status === SET && game.getNumberOfPlayers() >= 2) {
+      game.status = GO;
+      // START GAME
+      game.drawTiles();
+      game.updatePlayerTurn();
+      game.updateStatus();
+    }
   });
 
   socket.on('swap', (data) => {
-    game.getTiles(player);
+    if (!isActiveTurn()) {
+      return;
+    }
 
-    data.forEach((tile_id) => {
-      let tile = game.getTile(tile_id);
-      game.addTile(tile);
-    });
-
-    console.log('Player turn complete');
-    game.resetPlayedTiles();
-    game.updatePlayerTurn();
-    game.drawTiles();
+    const result = game.swapTiles(player, data);
+    if (!result.ok) {
+      player.socket.emit('issue', { code: 1, msg: result.msg });
+    } else {
+      console.log('Player swap/pass turn complete');
+    }
   });
 
   socket.on('update', (data) => {
+    if (!isActiveTurn() || !data) {
+      return;
+    }
+
     let tile = data.tile;
     let square = data.square;
+    let blankLetter = data.blankLetter || null;
 
-    game.updateBoard(tile, square);
+    game.updateBoard(tile, square, blankLetter);
   });
 
   // Event emitted when a player exits a game
   socket.on('disconnect', () => {
     console.log('Player disconnected');
-    if (game) {
-      game.removePlayer(player.id);
+    if (!game) {
+      return;
     }
 
-    if (game.status === READY) {
-      if (game.getNumberOfPlayers() === 0) {
-        // Remove game
-        games.removeGame(game.id);
-      }
-    } else if (game.status === SET) {
-      if (game.getNumberOfPlayers() === 0) {
-        // Remove game
-        games.removeGame(game.id);
-      } else if (game.getNumberOfPlayers() === 1) {
-        // Change status to staged
-        game.status = READY;
-        game.updateStatus();
-      }
-    }  else if (game.status >= GO) {
-      if (game.getNumberOfPlayers() === 0) {
-        // Remove game
-        games.removeGame(game.id);
-      } else if (game.getNumberOfPlayers() === 1) {
-        // The remaining player is the winner
-      }
+    const { shouldRemoveGame } = game.handleDisconnect(player.id);
+    if (shouldRemoveGame) {
+      games.removeGame(game.id);
     }
   });
 });

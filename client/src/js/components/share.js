@@ -18,13 +18,7 @@ export default function Share(props) {
   }
 
   function isVisible() {
-    let visible = false;
-
-    if (props.status === status.READY) {
-      visible = true;
-    }
-
-    return visible;
+    return props.status === status.READY || Boolean(props.joinError);
   }
 
   return (
@@ -33,12 +27,21 @@ export default function Share(props) {
 
       <div className="modal" id="share-modal">
         <div className="modal-container">
-          <h1>Share</h1>
-          <p>Send the link below with up to three friend. You will be able to play the game once others join.</p>
-          <form id="game-link-container">
-            <input id="game-link" type="text" value={window.location.href} readOnly />
-            <input id="copy-game-link" value="Copy" type="button" onClick={copy} />
-          </form>
+          {props.joinError ? (
+            <div>
+              <h1>Unable to Join</h1>
+              <p className="error">{props.joinError}</p>
+            </div>
+          ) : (
+            <div>
+              <h1>Share</h1>
+              <p>Send the link below to up to three friends. You will be able to play the game once others join.</p>
+              <form id="game-link-container">
+                <input id="game-link" type="text" value={window.location.href} readOnly />
+                <input id="copy-game-link" value="Copy" type="button" onClick={copy} />
+              </form>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -242,8 +242,10 @@ class App extends Component {
         "14_13": null,
         "14_14": null,
       },
+      blankLetters: {},
       errorMsg: "",
       gameId: "",
+      joinError: "",
       playerId: "",
       playerTiles: [],
       playerTray: [
@@ -261,7 +263,9 @@ class App extends Component {
       tilesToSwap: []
     };
 
+    this.cancelSwap = this.cancelSwap.bind(this);
     this.done = this.done.bind(this);
+    this.setBlankLetter = this.setBlankLetter.bind(this);
     this.setName = this.setName.bind(this);
     this.removeTileFromTray = this.removeTileFromTray.bind(this);
     this.setStatus = this.setStatus.bind(this);
@@ -272,85 +276,65 @@ class App extends Component {
     this.connect();
   }
 
-  arrangeTiles() {
-    this.state.playerTiles.forEach((tile) => {
-      if (!this.isTileInTray(tile)) {
-        this.addTileToTray(tile, null);
-      }
-    });
-  }
-
   addTileToTray(tile, slot) {
-    for (let space of this.state.playerTray) {
-      if (slot === null) {
-        if (space.tile_id === null) {
-          space.tile_id = tile.id;
-          break;
-        }
-      } else {
-        if (space.id === slot.id) {
+    this.setState((prevState) => {
+      const nextTray = prevState.playerTray.map((space) => ({ ...space }));
+      for (let space of nextTray) {
+        if (slot === null) {
+          if (space.tile_id === null) {
+            space.tile_id = tile.id;
+            break;
+          }
+        } else if (space.id === slot.id) {
           space.tile_id = tile.id;
           break;
         }
       }
-    }
+      return { playerTray: nextTray };
+    });
     console.log('Add tile to tray', tile);
     this.socket.emit('addTile', { tile_id: tile.id });
   }
 
   removeTileFromTray(tile) {
-    for (let slot of this.state.playerTray) {
-      if (slot.tile_id === tile.id) {
-        slot.tile_id = null;
-        break;
-      }
-    }
+    this.setState((prevState) => {
+      const nextTray = prevState.playerTray.map((slot) =>
+        slot.tile_id === tile.id ? { ...slot, tile_id: null } : { ...slot }
+      );
+      return { playerTray: nextTray };
+    });
     console.log('Remove tile from tray', tile);
     this.socket.emit('removeTile', { tile_id: tile.id });
   }
 
-  isTileInTray(tile) {
-    let tileInTray = false;
-
-    this.state.playerTray.forEach((slot) => {
-      if (slot.tile_id === tile.id) {
-        tileInTray = true;
-      }
-    });
-
-    return tileInTray;
+  isTrayFull() {
+    return this.state.playerTray.every((slot) => slot.tile_id !== null);
   }
 
-  isTrayFull() {
-    let isTrayFull = true;
-
-    this.state.playerTray.forEach((slot) => {
-      if (slot.tile_id === null) {
-        isTrayFull = false;
-      }
+  cancelSwap() {
+    this.setState({
+      errorMsg: "",
+      swap: false,
+      tilesToSwap: []
     });
-
-    return isTrayFull;
   }
 
   done() {
     if (this.isTrayFull() && this.state.swap === false && this.state.status === status.GO) {
       console.log('Player tray is full');
       this.setState({
-        swap: true
+        errorMsg: "",
+        swap: true,
+        tilesToSwap: []
       });
     } else {
       if (this.state.swap === true) {
-        this.state.tilesToSwap.forEach((tile_id) => {
-          let tile = {};
-          tile.id = tile_id;
-          this.removeTileFromTray(tile);
-        });
-
         this.socket.emit('swap', this.state.tilesToSwap);
 
         this.setState({
-          swap: false
+          errorMsg: "",
+          swap: false,
+          tilesToSwap: []
         });
       } else {
         this.socket.emit('done');
@@ -361,11 +345,17 @@ class App extends Component {
   }
 
   getGameId() {
-    return window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
+    const pathname = window.location.pathname.replace(/\/+$/, '');
+    return pathname.substring(pathname.lastIndexOf('/') + 1);
   }
 
   getPlayerId(socket) {
     return socket.id;
+  }
+
+  setBlankLetter(tile, letter) {
+    console.log('Set blank letter', tile, letter);
+    this.socket.emit('blankLetter', { tile, letter });
   }
 
   setName(name) {
@@ -376,11 +366,13 @@ class App extends Component {
   swapTile(tile_id) {
     console.log('Swap tile', tile_id);
 
-    if (this.state.tilesToSwap.includes(tile_id)) {
-      this.state.tilesToSwap.splice(this.state.tilesToSwap.indexOf(tile_id), 1);
-    } else {
-      this.state.tilesToSwap.push(tile_id);
-    }
+    this.setState((prevState) => {
+      const exists = prevState.tilesToSwap.includes(tile_id);
+      const nextTilesToSwap = exists
+        ? prevState.tilesToSwap.filter((id) => id !== tile_id)
+        : [...prevState.tilesToSwap, tile_id];
+      return { tilesToSwap: nextTilesToSwap };
+    });
   }
 
   setStatus(status) {
@@ -388,9 +380,9 @@ class App extends Component {
     this.socket.emit('status', { status });
   }
 
-  updateBoard(tile, square) {
+  updateBoard(tile, square, blankLetter = null) {
     console.log('Update board', tile, square);
-    this.socket.emit('update', { tile, square });
+    this.socket.emit('update', { tile, square, blankLetter });
   }
 
   connect() {
@@ -428,36 +420,81 @@ class App extends Component {
 
     this.socket.on('tiles', (data) => {
       console.log('tiles', data.tiles);
-      this.setState({
-        playerTiles: data.tiles
-      });
+      this.setState((prevState) => {
+        const validIds = new Set(data.tiles.map((tile) => tile.id));
+        const nextTray = prevState.playerTray.map((slot) => ({
+          ...slot,
+          tile_id: slot.tile_id && validIds.has(slot.tile_id) ? slot.tile_id : null
+        }));
 
-      this.arrangeTiles();
+        const placedInTray = new Set(nextTray.map((slot) => slot.tile_id).filter(Boolean));
+        data.tiles.forEach((tile) => {
+          if (!placedInTray.has(tile.id)) {
+            const emptySlot = nextTray.find((slot) => slot.tile_id === null);
+            if (emptySlot) {
+              emptySlot.tile_id = tile.id;
+              placedInTray.add(tile.id);
+            }
+          }
+        });
+
+        return {
+          playerTiles: data.tiles,
+          playerTray: nextTray
+        };
+      });
     });
 
     this.socket.on('turn', (data) => {
       console.log('turn', data.turn);
       this.setState({
         errorMsg: "",
+        swap: false,
+        tilesToSwap: [],
         turn: data.turn
       });
     });
 
+    this.socket.on('blankLetter', (data) => {
+      console.log('blankLetter', data);
+      this.setState((prevState) => ({
+        blankLetters: {
+          ...prevState.blankLetters,
+          [data.tile]: data.letter
+        }
+      }));
+    });
+
     this.socket.on('update', (data) => {
       console.log('update', data);
-      let board = {...this.state.board};
-       board[data.square] = data.tile;
-       this.setState({
-         board: board
-       });
+      this.setState((prevState) => {
+        const prevTile = prevState.board[data.square];
+        const nextBoard = { ...prevState.board, [data.square]: data.tile };
+        const nextBlankLetters = { ...prevState.blankLetters };
+
+        if (data.tile === null && (prevTile === '_1' || prevTile === '_2')) {
+          delete nextBlankLetters[prevTile];
+        } else if ((data.tile === '_1' || data.tile === '_2') && data.blankLetter) {
+          nextBlankLetters[data.tile] = data.blankLetter;
+        }
+
+        return {
+          board: nextBoard,
+          blankLetters: nextBlankLetters
+        };
+      });
     });
 
     this.socket.on('issue', (data) => {
       console.log('error', data);
-      if (data.hasOwnProperty('code')) {
+      if (data && data.hasOwnProperty('code')) {
         if (data.code === 1) {
           this.setState({
             errorMsg: data.msg,
+          });
+        } else if (data.code === 2) {
+          this.setState({
+            joinError: data.msg,
           });
         }
       }
@@ -467,8 +504,28 @@ class App extends Component {
   render() {
     return (
       <div>
-        <Share status={this.state.status} />
-        <Game board={this.state.board} done={this.done} errorMsg={this.state.errorMsg} playerId={this.state.playerId} playerTray={this.state.playerTray} players={this.state.players} removeTileFromTray={this.removeTileFromTray} setName={this.setName} setStatus={this.setStatus} status={this.state.status} swap={this.state.swap} swapTile={this.swapTile} turn={this.state.turn} updateBoard={this.updateBoard} addTileToTray={this.addTileToTray} />
+        <Share joinError={this.state.joinError} status={this.state.status} />
+        <Game
+          addTileToTray={this.addTileToTray}
+          blankLetters={this.state.blankLetters}
+          board={this.state.board}
+          cancelSwap={this.cancelSwap}
+          done={this.done}
+          errorMsg={this.state.errorMsg}
+          playerId={this.state.playerId}
+          playerTray={this.state.playerTray}
+          players={this.state.players}
+          removeTileFromTray={this.removeTileFromTray}
+          setBlankLetter={this.setBlankLetter}
+          setName={this.setName}
+          setStatus={this.setStatus}
+          status={this.state.status}
+          swap={this.state.swap}
+          swapTile={this.swapTile}
+          tilesToSwap={this.state.tilesToSwap}
+          turn={this.state.turn}
+          updateBoard={this.updateBoard}
+        />
       </div>
     );
   }

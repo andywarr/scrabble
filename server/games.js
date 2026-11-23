@@ -22,7 +22,7 @@ class Games {
 
   doesGameExist(id) {
     console.log("Finding game", id);
-    return this.games.includes(game => game.id === id);
+    return this.games.some(game => game.id === id);
   }
 
   get games() {

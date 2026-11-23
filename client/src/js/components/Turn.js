@@ -54,7 +54,7 @@ export default function Turn(props) {
       <div>
         <p>It's your turn.</p>
         <p>Drag tiles from your tray onto the board to spell words.</p>
-        <p>You do not have the option to swap all or some of your tiles as there are no more tiles.</p>
+        <p>You cannot swap tiles when fewer than 7 tiles remain in the bag. Press 'Done' without placing tiles to pass your turn.</p>
         <p>When you have finished spelling words, press 'Done'</p>
         <p className="error">{props.errorMsg}</p>
         <input onClick={() => props.done()}
@@ -72,10 +72,15 @@ export default function Turn(props) {
     return (
       <div>
         <p>Select the tiles in your tray that you wish to swap.</p>
-        <p>When you have finished selecting the tiles you wish to swap, if any, press 'Done'.</p>
+        <p>When you have finished selecting the tiles you wish to swap (or none to pass), press 'Done'.</p>
+        <p className="error">{props.errorMsg}</p>
         <input onClick={() => props.done()}
                type="button"
                value="Done" />
+        <input onClick={() => props.cancelSwap()}
+               type="button"
+               value="Cancel"
+               style={{ marginLeft: "8px" }} />
       </div>
     );
   }

@@ -336,12 +336,12 @@ exports.tiles = [
   },
   {
     id: "p_1",
-    letter: "o",
+    letter: "p",
     score: 3
   },
   {
     id: "p_2",
-    letter: "o",
+    letter: "p",
     score: 3
   },
   {
